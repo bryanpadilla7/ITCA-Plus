@@ -1,0 +1,116 @@
+﻿
+@{
+    ViewBag.Title = "CuadroCalificaciones";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    @model ITCA_Plus.Models.notasEstudiantes
+}
+
+<h2>Cuadro de Calificaciones</h2>
+<div class="container d-flex justify-content-center align-items-center">
+    <div class="card" style="width: 800px;">
+        <h5 class="card-header text-center" style="background-color: #aeb6bf;">Filtrar</h5>
+        <div class="card-body">
+            <!-- Formulario para agregar notas por alumno-->
+            @using (Html.BeginForm("CuadroCalificaciones", "notas", System.Web.Mvc.FormMethod.Post))
+            {
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.gradoEstudiante, "Grado: ", new { @class = "form-label" })
+                        @Html.DropDownListFor(m => m.gradoEstudiante, new SelectList(ViewBag.grado_estudiante, "Value", "Text"), "Seleccione el grado", new { @class = "form-control" })
+
+                    </div>
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.seccionEstudiante, "Sección: ", new { @class = "form-label" })
+                        @Html.DropDownListFor(m => m.seccionEstudiante, new SelectList(ViewBag.seccion, "Value", "Text"), "Seleccione la sección", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        @Html.LabelFor(m => m.materiaGrado, "Materia: ", new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.materiaGrado, new { @class = "form-control", placeholder = "Materia por dropdownList", style = "max-width: none;" })
+                    </div>
+                    <div class="col-12 mb-3">
+                        <!-- agregar el evento focus, cuando quiera llenar este campo, debe de estar llenos el grado y seccion para poderle
+                mostrar la lista de alumnos de ese único grado y sección-->
+                        @Html.LabelFor(m => m.nombreCompletoEstudiante, "Nombre completo: ", new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.nombreCompletoEstudiante, new { @class = "form-control", placeholder = "Nombre por dropdownList", style = "max-width: none;" })
+                    </div>
+                </div>
+                <div class="d-grid gap-2">
+                    <input type="submit" value="Filtrar" class="btn btn-outline-info" style="max-width: none;" />
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    
+        <div class="card" style="width: 100%;">
+            <h5 class="card-header" style="background-color: #aeb6bf;">Resultados de la búsqueda:</h5>
+            <div class="card-body">
+                <!-- Contenedor de Bootstrap para hacer la tabla desplazable -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="text-center" style="background-color: #d4efdf;">
+                            <tr>
+                                <th scope="col">CARNET</th>
+                                <th scope="col">ESTUDIANTE</th>
+                                <th scope="col">NOTA #1</th>
+                                <th scope="col">NOTA #2</th>
+                                <th scope="col">NOTA #3</th>
+                                <th scope="col">PROMEDIO PRIMER TRIMESTRE</th>
+                                <th scope="col">NOTA #1</th>
+                                <th scope="col">NOTA #2</th>
+                                <th scope="col">NOTA #3</th>
+                                <th scope="col">PROMEDIO SEGUNDO TRIMESTRE</th>
+                                <th scope="col">NOTA #1</th>
+                                <th scope="col">NOTA #2</th>
+                                <th scope="col">NOTA #3</th>
+                                <th scope="col">PROMEDIO TERCER TRIMESTRE</th>
+                                <th scope="col">ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1111</th>
+                                <td>ANA MARJORIE MARTINEZ MEJIA</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>10</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <!--CON UN SWEETALERT SOLO LE CONFIRMARE SÍ DESEA TERMINAR ESA ACCION, PARA ENVIARLE LA INFO AL ADMIN (ver EP1_DPWA)-->
+                                        <button type="submit" class="btn btn-dark btn-sm">
+                                            <i class="fa-solid fa-user-pen"></i> Editar
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <p>Recuerda que: Las calificaciones guardadas no se podrán editar sin el previo permiso del administrador</p>
+                <div class="d-grid gap-2">
+                    <input type="submit" value="Guardar notas" class="btn btn-outline-success" style="max-width: none;" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
