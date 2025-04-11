@@ -10,6 +10,7 @@ namespace ITCA_Plus.Controllers
 {
     public class notasController : Controller
     {
+        ITCAPlusEntities contexto = new ITCAPlusEntities();
         public void listaGrados()
         {
             //tendre que hacer la consulta de que usuario docente esta logeado, para solo ponerle en estas listas
@@ -58,7 +59,9 @@ namespace ITCA_Plus.Controllers
 
         public ActionResult CertificadoNotas()
         {
-
+            List<Alumno> data = contexto.Alumno.ToList();
+            //enviar a la lista
+            ViewBag.data = data;
             listaGrados();
             seccionGrados();
             return View();

@@ -1,44 +1,32 @@
 ﻿
 @{
+   
+    @model ITCA_Plus.Models.Alumno
     ViewBag.Title = "CertificadoNotas";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    @model ITCA_Plus.Models.notasEstudiantes
+
 }
 
-<h2>Certificado de Notas</h2>
-<div class="container d-flex justify-content-center align-items-center">
-<div class="card" style="width: 800px;">
-    <h5 class="card-header text-center" style="background-color: #aeb6bf;">Filtrar</h5>
-    <div class="card-body">
-        <!-- Formulario para agregar notas por alumno-->
-        @using (Html.BeginForm("CertificadoNotas", "notas", System.Web.Mvc.FormMethod.Post))
-        {
-            @Html.ValidationSummary("", new { @class = "text-danger" })
-            <div class="row">
-                <div class="col-md-6">
-                    @Html.LabelFor(m => m.gradoEstudiante, "Grado: ", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.gradoEstudiante, new SelectList(ViewBag.grado_estudiante, "Value", "Text"), "Seleccione el grado", new { @class = "form-control" })
-
-                </div>
-                <div class="col-md-6">
-                    @Html.LabelFor(m => m.seccionEstudiante, "Sección: ", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.seccionEstudiante, new SelectList(ViewBag.seccion, "Value", "Text"), "Seleccione la sección", new { @class = "form-control" })
-                </div>
+            <div id="contenido">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td>Carnet</td>
+                            <td>Nombre</td>
+                            <td>Nacimiento</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (ITCA_Plus.Models.Alumno item in ViewBag.data)
+                            {
+                                <tr>
+                                    <td>@item.carnet</td>
+                                    <td>@item.nombre</td>
+                                    <td>@item.fecha_nacimiento</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    @Html.LabelFor(m => m.materiaGrado, "Materia: ", new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.materiaGrado, new { @class = "form-control", placeholder = "Materia por dropdownList", style = "max-width: none;" })
-                </div>
-                <div class="col-12 mb-3">
-                    <!-- agregar el evento focus, cuando quiera llenar este campo, debe de estar llenos el grado y seccion para poderle
-                    mostrar la lista de alumnos de ese único grado y sección-->
-                    @Html.LabelFor(m => m.nombreCompletoEstudiante, "Nombre completo: ", new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.nombreCompletoEstudiante, new { @class = "form-control", placeholder = "Nombre por dropdownList", style = "max-width: none;" })
-                </div>
-            </div>
-            <div class="d-grid gap-2">
-                <input type="submit" value="Filtrar" class="btn btn-outline-info" style="max-width: none;" />
-            </div>
-        }
-
