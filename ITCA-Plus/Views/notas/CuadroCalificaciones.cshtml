@@ -1,4 +1,4 @@
-﻿
+﻿<!--Variables globales-->
 @{
     ViewBag.Title = "CuadroCalificaciones";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,6 +6,74 @@
     var notasLista = ViewBag.NotasFiltradas as List<ITCA_Plus.Models.vw_AlumnosPorMateriaGrado>;
 
 }
+<!--Filtrado para visualizaciones-->
+<script>
+    $(document).ready(function () {
+          $("#gradoDList").on("change", function () {
+                var gradoId = $(this).val();
+
+                 if (gradoId != null) {
+                    $.ajax({
+                        url: '@Url.Action("ObtenerMaterias", "notas")',
+                        type: 'POST',
+                        data: {
+                            grado: gradoId
+                        },
+                        success: function (data) {
+                            // Limpiar y llenar el combo de alumnos
+                            var $materiaDropdown = $("#materiaDList");
+                            $materiaDropdown.empty();
+                            $materiaDropdown.append('<option value="">Seleccione materia</option>');
+
+                            $.each(data, function (i, item) {
+                                $materiaDropdown.append('<option value="' + item.Value + '">' + item.Text + '</option>');
+                            });
+
+                            // Mostrar el div si estaba oculto
+                            $("#materia").show();
+                        },
+                        error: function () {
+                            alert("Seleccione una opción válida");
+                        }
+                    });
+                }
+            });
+         $("#materiaDList").on("change", function () {
+             var gradoId = $("#gradoDList").val(); 
+            console.log(gradoId)
+             var materia = $(this).val();
+             console.log(materia)
+             if (gradoId != null && materia != null) {
+                $.ajax({
+                    url: '@Url.Action("ObtenerAlumnosPorGrado", "notas")',
+                    type: 'POST',
+                    data: {
+                        grado: gradoId,
+                        mat: materia
+                    },
+                    success: function (data) {
+                        // Limpiar y llenar el combo de alumnos
+                        var $alumnoDropdown = $("#alumDList");
+                        $alumnoDropdown.empty();
+                        $alumnoDropdown.append('<option value="">Seleccione alumno</option>');
+
+                        $.each(data, function (i, item) {
+                            $alumnoDropdown.append('<option value="' + item.Value + '">' + item.Text + '</option>');
+                        });
+
+                        // Mostrar el div si estaba oculto
+                        $("#alumno").show();
+                    },
+                    error: function () {
+                        alert("Error al obtener los alumnos.");
+                    }
+                });
+            }
+         });
+
+    });
+</script>
+
 
 <h2>Cuadro de Calificaciones</h2>
 <div class="container d-flex justify-content-center align-items-center">
@@ -14,25 +82,34 @@
         <div class="card-body">
             <!-- Formulario para agregar notas por alumno-->
             @using (Html.BeginForm("CuadroCalificaciones", "notas", System.Web.Mvc.FormMethod.Post))
-            {
-                @Html.ValidationSummary("", new { @class = "text-danger" })
-                        <div class="mb-3">
-                            @Html.Label("Grado:")
-                            @Html.DropDownList("grado", (IEnumerable<SelectListItem>)ViewBag.cmbGrado, "Seleccione grado", htmlAttributes: new { @class = "form-control w-100", id = "gradoDList", style = "max-width: none;" })
-                        </div>
+            { 
+                <div class="mb-3">
+                    @Html.Label("Grado:")
+                    @Html.DropDownList("grado", (IEnumerable<SelectListItem>)ViewBag.cmbGrado, "Seleccione grado", htmlAttributes: new { @class = "form-control", required = "required", id = "gradoDList", style = "max-width: none;" })
+                </div>
 
-                        <div class="mb-3">
-                            @Html.Label("Materia:")
-                            @Html.DropDownList("materia", (IEnumerable<SelectListItem>)ViewBag.cmbMateria, "Seleccione materia", htmlAttributes: new { @class = "form-control w-100", id = "materiaDList", style = "max-width: none;" })
-                        </div>
-                    <div class="d-grid gap-2 mt-4">
-                        <input type="submit" value="Buscar" class="btn btn-outline-info" style="max-width: none;" />
-                    </div>
-               
+                <div class="mb-3" id="materia" style="display: none;">
+                    @Html.Label("Materia:")
+                    <select id="materiaDList" name="materia" class="form-control" required="required" style="max-width: none;">
+                        <option value="">Seleccione materia</option>
+                    </select>               
+                </div>
+                <div class="mb-3" id="alumno" style="display: none;">
+                    @Html.Label("Alumno:")
+                    <select id="alumDList" name="alumno" class="form-control" style="max-width: none;">
+                        <option value="">Seleccione alumno</option>
+                    </select>
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                    <input type="submit" value="Buscar" class="btn btn-outline-info" style="max-width: none;" />
+                </div>
+
             }
         </div>
     </div>
 </div>
+
+
 <div class="container d-flex justify-content-center align-items-center mt-5">
     <div class="card" style="width: 800px;">
         <h5 class="card-header text-center" style="background-color: #aeb6bf;">Resultados de la búsqueda</h5>
@@ -45,6 +122,9 @@
                         <tr>
                             <td>Carnet</td>
                             <td>Nombre Alumno</td>
+                            <td>Notas 1° Trimestre</td>
+                            <td>Notas 2° Trimestre</td>
+                            <td>Notas 3° Trimestre</td>
                             <td>Acciones</td>
                         </tr>
                     </thead>
@@ -53,17 +133,31 @@
                             foreach (ITCA_Plus.Models.vw_AlumnosPorMateriaGrado item in notasLista)
                             {
                                 <tr>
+                                    <td class="scope">@item.carnet</td>
                                     <td>@item.alumno</td>
-                                    <td>@item.carnet</td>
+                                    @for (int i = 1; i <= 3; i++)
+                                    {
+                                        <td>
+                                            <button class="btn btn-dark btn-sm">
+                                                <i class="fas fa-file-lines"></i> Agregar notas
+                                            </button>
+                                        </td>
+                                    }
                                     <td>
-                                        <a href="" class="btn btn-primary btn-sm">Editar</a>
-                                        <a href="" class="btn btn-danger btn-sm">Eliminar</a>
+                                        <a href="" class="btn btn-primary btn-sm">
+                                            <i class="fa-solid fa-user-pen"></i> Editar
+                                        </a>
                                     </td>
                                 </tr>
                             }
                         }
                     </tbody>
                 </table>
+
+                <script>
+                    document.getElementById('alumno').style.display = 'block';
+                    document.getElementById('materia').style.display = 'block';
+                </script>
             }
         </div>
     </div>
