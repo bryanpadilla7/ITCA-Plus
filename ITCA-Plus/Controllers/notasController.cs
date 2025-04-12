@@ -69,13 +69,13 @@ namespace ITCA_Plus.Controllers
                 {
                   var notas = contexto.vw_AlumnosPorMateriaGrado.Where(n => n.grado_id == grado
                         && n.materia_id == materia && n.alumno_id == alumno).ToList();
-                    ViewBag.NotasFiltradas = notas;
+                    ViewBag.ListadoPorMateriaGrado = notas;
                 }
                 else
                 {
                     var notas = contexto.vw_AlumnosPorMateriaGrado.Where(n => n.grado_id == grado
                         && n.materia_id == materia).ToList();
-                    ViewBag.NotasFiltradas = notas;
+                    ViewBag.ListadoPorMateriaGrado = notas;
                 }
             }
             

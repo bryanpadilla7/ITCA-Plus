@@ -3,10 +3,10 @@
     ViewBag.Title = "CuadroCalificaciones";
     Layout = "~/Views/Shared/_Layout.cshtml";
     @model ITCA_Plus.Models.Notas
-    var notasLista = ViewBag.NotasFiltradas as List<ITCA_Plus.Models.vw_AlumnosPorMateriaGrado>;
+    var Listado = ViewBag.ListadoPorMateriaGrado as List<ITCA_Plus.Models.vw_AlumnosPorMateriaGrado>;
 
 }
-<!--Filtrado para visualizaciones-->
+<!--Acciones para visualizaciones-->
 <script>
     $(document).ready(function () {
           $("#gradoDList").on("change", function () {
@@ -39,7 +39,7 @@
                 }
             });
          $("#materiaDList").on("change", function () {
-             var gradoId = $("#gradoDList").val(); 
+             var gradoId = $("#gradoDList").val();
             console.log(gradoId)
              var materia = $(this).val();
              console.log(materia)
@@ -76,13 +76,14 @@
 
 
 <h2>Cuadro de Calificaciones</h2>
+<!--Card filtradora de listado-->
 <div class="container d-flex justify-content-center align-items-center">
     <div class="card" style="width: 800px;">
         <h5 class="card-header text-center" style="background-color: #aeb6bf;">Filtrar</h5>
         <div class="card-body">
             <!-- Formulario para agregar notas por alumno-->
             @using (Html.BeginForm("CuadroCalificaciones", "notas", System.Web.Mvc.FormMethod.Post))
-            { 
+            {
                 <div class="mb-3">
                     @Html.Label("Grado:")
                     @Html.DropDownList("grado", (IEnumerable<SelectListItem>)ViewBag.cmbGrado, "Seleccione grado", htmlAttributes: new { @class = "form-control", required = "required", id = "gradoDList", style = "max-width: none;" })
@@ -92,7 +93,7 @@
                     @Html.Label("Materia:")
                     <select id="materiaDList" name="materia" class="form-control" required="required" style="max-width: none;">
                         <option value="">Seleccione primero un grado válido</option>
-                    </select>               
+                    </select>
                 </div>
                 <div class="mb-3" id="alumno" style="display: none;">
                     @Html.Label("Alumno:")
@@ -109,12 +110,12 @@
     </div>
 </div>
 
-
+<!--Card que muestra los datos filtrados-->
 <div class="container d-flex justify-content-center align-items-center mt-5">
     <div class="card" style="width: 800px;">
         <h5 class="card-header text-center" style="background-color: #aeb6bf;">Resultados de la búsqueda</h5>
         <div class="card-body">
-            @if (ViewBag.NotasFiltradas != null && notasLista.Any())
+            @if (ViewBag.ListadoPorMateriaGrado != null && Listado.Any())
             {
 
                 <table class="table">
@@ -125,12 +126,13 @@
                             <td>Notas 1° Trimestre</td>
                             <td>Notas 2° Trimestre</td>
                             <td>Notas 3° Trimestre</td>
+                            <!--Aqui deberia de ir el promedio por trimestre-->
                             <td>Acciones</td>
                         </tr>
                     </thead>
                     <tbody>
                         @{
-                            foreach (ITCA_Plus.Models.vw_AlumnosPorMateriaGrado item in notasLista)
+                            foreach (ITCA_Plus.Models.vw_AlumnosPorMateriaGrado item in Listado)
                             {
                                 <tr>
                                     <td class="scope">@item.carnet</td>
@@ -138,7 +140,7 @@
                                     @for (int i = 1; i <= 3; i++)
                                     {
                                         <td>
-                                            <button class="btn btn-dark btn-sm">
+                                            <button class="btn btn-dark btn-sm" id="@i" data-bs-toggle="modal" data-bs-target="#AgregarNotasModal">
                                                 <i class="fas fa-file-lines"></i> Agregar notas
                                             </button>
                                         </td>
@@ -163,7 +165,69 @@
     </div>
 </div>
 
-
-
-
-
+<!-- AgregarNotasModal -->
+<div class="modal fade" id="AgregarNotasModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Notas Periodo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                <thead>
+                    <tr>
+                        <td class="scope">Periodo</td>
+                        <td>Notas 1°</td>
+                        <td>Notas 2°</td>
+                        <td>Notas 3°</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="scope">1° trimestre</td>
+                        <td>
+                            @Html.TextBoxFor(m => m.nota1, new
+                            {
+                                @class = "form-control",
+                               type = "number",
+                               min = "0.1",
+                               max = "10",
+                               step = "0.1",
+                               placeholder = "9.5"
+                       })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.nota2, new
+                            {
+                                @class = "form-control",
+                                type = "number",
+                                min = "0.1",
+                                max = "10",
+                                step = "0.1",
+                                placeholder = "9.5"
+                             })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.nota3, new
+                            {
+                                @class = "form-control",
+                               type = "number",
+                               min = "0.1",
+                               max = "10",
+                               step = "0.1",
+                               placeholder = "9.5"
+                            })
+                        </td>
+                    </tr>
+                               
+                </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-outline-success">Guardar notas</button>
+            </div>
+        </div>
+    </div>
+</div>
