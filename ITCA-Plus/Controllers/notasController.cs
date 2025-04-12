@@ -14,10 +14,8 @@ namespace ITCA_Plus.Controllers
     {
         ITCAPlusEntities contexto = new ITCAPlusEntities();
         int userActualID = 1;
-        public void llenarCmb(int flag=0)
+        public void llenarCmb()
         {
-            if(flag > 0)
-            {
                 //cmbGrado
                 ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID)
                     .Select(x => new SelectListItem
@@ -26,31 +24,6 @@ namespace ITCA_Plus.Controllers
                         Value = x.grado_id.ToString()
                     }).Distinct()
                     .ToList();
-            }
-            else
-            {
-                //cmbGrado
-                ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID)
-                    .Select(x => new SelectListItem
-                    {
-                        Text = x.grado_nombre,
-                        Value = x.grado_id.ToString()
-                    }).Distinct()
-                    .ToList();
-                //View Por default
-             ViewBag.cmbMateria = new List<SelectListItem>
-            {
-               new SelectListItem { Text = "1", Value="1"},
-               new SelectListItem { Text = "1", Value="1"}
-            };
-             ViewBag.cmbAlumnos = new List<SelectListItem>
-            {
-               new SelectListItem { Text = "1", Value="1"},
-               new SelectListItem { Text = "1", Value="1"}
-             };
-            }
-            
-
         }
         [HttpPost]
         public JsonResult ObtenerAlumnosPorGrado(int grado,int mat)
@@ -90,6 +63,8 @@ namespace ITCA_Plus.Controllers
         {
             if (ModelState.IsValid)
             {
+                ModelState.Remove("grado");
+                llenarCmb();
                 if (alumno != 0)
                 {
                   var notas = contexto.vw_AlumnosPorMateriaGrado.Where(n => n.grado_id == grado
@@ -103,7 +78,7 @@ namespace ITCA_Plus.Controllers
                     ViewBag.NotasFiltradas = notas;
                 }
             }
-            llenarCmb(1);
+            
             return View();
         }
 
