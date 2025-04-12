@@ -11,50 +11,59 @@ namespace ITCA_Plus.Controllers
     public class notasController : Controller
     {
         ITCAPlusEntities contexto = new ITCAPlusEntities();
-        public void listaGrados()
+        int userActualID = 1;
+        public void llenarCmb()
         {
-            //tendre que hacer la consulta de que usuario docente esta logeado, para solo ponerle en estas listas
-            //los grados con los que trabaja.
-            ViewBag.grado_estudiante = new List<SelectListItem>
+            //Llenado de cmb para filtrar
+            //cmbAlumnos
+            ViewBag.cmbAlumnos = contexto.Alumno.Select(x => new SelectListItem
+            {
+                Text = x.nombre,
+                Value = x.id.ToString(),
+            });
+            //cmbMateria
+            ViewBag.cmbMateria = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID)
+                .Select(x => new SelectListItem
                 {
-                   new SelectListItem { Text = "Primer grado", Value="1"},
-                   new SelectListItem { Text = "Segundo grado", Value="2"},
-                   new SelectListItem { Text = "Tercer grado", Value="3"},
-                   new SelectListItem { Text = "Cuarto grado", Value="4"},
-                   new SelectListItem { Text = "Quinto grado", Value="5"},
-                   new SelectListItem { Text = "Sexto grado", Value="6"},
-                   new SelectListItem { Text = "Séptimo grado", Value="7"},
-                   new SelectListItem { Text = "Octavo grado", Value="8"},
-                   new SelectListItem { Text = "Noveno grado", Value="9"}
-                };
-        }
-        public void seccionGrados()
-        {
-            ViewBag.seccion = new List<SelectListItem>
+                    Text = x.materia_nombre, 
+                    Value = x.materia_id.ToString()
+                }).Distinct() 
+                .ToList();
+            //cmbGrado
+            ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID)
+                .Select(x => new SelectListItem
                 {
-                   new SelectListItem { Text = "A", Value="A"},
-                   new SelectListItem { Text = "B", Value="B"}
-                };
+                    Text = x.grado_nombre,
+                    Value = x.grado_id.ToString()
+                }).Distinct()
+                .ToList();
+            //cmbseccion
+            ViewBag.cmbSeccion = contexto.Grado.Select(x => new SelectListItem
+            {
+                Text = x.seccion,
+                Value = x.seccion.ToString(),
+            });
+            
         }
+        
         // GET: notas
         public ActionResult CuadroCalificaciones()
         {
-            listaGrados();
-            seccionGrados();
+            llenarCmb();
             return View();
         }
         [HttpPost]
-        public ActionResult CuadroCalificaciones(notasEstudiantes notas)
+        public ActionResult CuadroCalificaciones(int grado, int materia)
         {
-
             if (ModelState.IsValid)
             {
-                // Procesar la lógica de guardado
-                // Redirigir a otra acción o devolver una vista
+                var notas = contexto.vw_AlumnosPorMateriaGrado.Where(n => n.grado_id == grado
+                && n.materia_id == materia).ToList();
+
+                ViewBag.NotasFiltradas = notas;
             }
-            listaGrados();
-            seccionGrados();
-            return View(notas);
+            llenarCmb();
+            return View();
         }
 
         public ActionResult CertificadoNotas()
@@ -62,8 +71,6 @@ namespace ITCA_Plus.Controllers
             List<Alumno> data = contexto.Alumno.ToList();
             //enviar a la lista
             ViewBag.data = data;
-            listaGrados();
-            seccionGrados();
             return View();
         }
         [HttpPost]  
@@ -74,8 +81,6 @@ namespace ITCA_Plus.Controllers
                 // Procesar la lógica de guardado
                 // Redirigir a otra acción o devolver una vista
             }
-            listaGrados();
-            seccionGrados();
             return View(notas);
         }
     }

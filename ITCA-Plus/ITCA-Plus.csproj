@@ -182,7 +182,6 @@
     <Compile Include="Models\Notas.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\notasEstudiantes.cs" />
     <Compile Include="Models\PeriodoEscolar.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
