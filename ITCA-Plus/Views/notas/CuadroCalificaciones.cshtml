@@ -4,7 +4,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     @model ITCA_Plus.Models.Notas
     var Listado = ViewBag.ListadoPorMateriaGrado as List<ITCA_Plus.Models.vw_AlumnosPorMateriaGrado>;
-
+    var yaGuardadas = ViewBag.NotasYaGuadadas as List<ITCA_Plus.Models.Notas>;
+    string[] trimestres = { "Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre" };
 }
 <!--Acciones para visualizaciones-->
 <script>
@@ -70,8 +71,91 @@
                 });
             }
          });
+        $('#AgregarNotasModal').on('show.bs.modal', function (event) {
+            var btnQueAbrioElModal = $(event.relatedTarget);
+            var trimestre = btnQueAbrioElModal.attr('name');
+            $('#trimestre').text(trimestre);
+            let alumnoId = btnQueAbrioElModal.data('alumnoid');
+            let materiaId = btnQueAbrioElModal.data('materiaid');
+
+
+            if (!alumnoId || !materiaId) {
+                alumnoId = $('#alumDList').val();
+                materiaId = $('#materiaDList').val();
+            }
+            $('#alumnoId').val(alumnoId);
+            $('#materiaId').val(materiaId);
+            $('#anioEscolar').val(1);
+            $('#trimestresInput').val(trimestre);
+            console.log(materiaId)
+            // Consultar si ya existen notas
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("NotasGuardadas", "notas")',
+                data: {
+                    materia: materiaId,
+                    alumno: alumnoId,
+                    trimestre: trimestre
+                },
+                success: function (response) {
+                    if (response == "Existe") {
+                        $("#btnGuardar").val("Editar");
+                        $("#btnGuardar").attr("class", "btn btn-outline-primary");
+                        $("#btnGuardar").attr("onclick", "enviarForm()");
+                    } else {
+                        $("#btnGuardar").val("Guardar");
+                        $("#btnGuardar").attr("class", "btn btn-outline-success");
+                        $("#btnGuardar").attr("onclick", "enviarForm()");
+                    }
+                },
+                error: function () {
+                    alert("Error al verificar existencia de notas.");
+                }
+            });
+
+
+        });
 
     });
+    function enviarForm() {
+        var periodo = $("#trimestre").text();
+        var nota1 = $("#txtNota1").val();
+        var nota2 = $("#txtNota2").val();
+        var nota3 = $("#txtNota3").val();
+        var alumnoid = $('#alumnoId').val();
+        var materiaId = $('#materiaId').val();
+        var anioEscolar = $('#anioEscolar').val();
+        console.log(materiaId)
+        if (periodo == "" || nota1 == "" || nota2 == "" || nota3 == "" || materiaId == "" || alumnoid == "" || anioEscolar == "") {
+            alert("Todos los campos son requeridos");
+            return;
+        }
+
+        var datos = $("#formNotas");
+        var boton = $("#btnGuardar").val();
+        var formData = datos.serialize() + "&boton=" + boton;
+
+        
+         $.ajax({
+             type: "POST",
+             url: '@Url.Action("IngresoNotas", "notas")',
+             data: formData,
+             success: function (response) {
+                 if (response == "Guardadas" || response == "Modificadas") {
+                     $("button[data-alumnoid='" + formData.alumno_id + "'][data-materiaid='" + formData.materia_id + "'][name='" + periodo + "']")
+                         .prop("disabled", true);
+                     alert("Notas " + response + " con éxito!");
+                     location.reload();
+                 } else {
+                     alert("Acción cancelada.");
+                 }
+         },
+             error: function () {
+                 alert("Error al procesar la solicitud.");
+             }
+         });
+
+    }
 </script>
 
 
@@ -126,7 +210,6 @@
                             <td>Notas 1° Trimestre</td>
                             <td>Notas 2° Trimestre</td>
                             <td>Notas 3° Trimestre</td>
-                            <!--Aqui deberia de ir el promedio por trimestre-->
                             <td>Acciones</td>
                         </tr>
                     </thead>
@@ -134,23 +217,38 @@
                         @{
                             foreach (ITCA_Plus.Models.vw_AlumnosPorMateriaGrado item in Listado)
                             {
-                                <tr>
-                                    <td class="scope">@item.carnet</td>
-                                    <td>@item.alumno</td>
-                                    @for (int i = 1; i <= 3; i++)
-                                    {
-                                        <td>
-                                            <button class="btn btn-dark btn-sm" id="@i" data-bs-toggle="modal" data-bs-target="#AgregarNotasModal">
-                                                <i class="fas fa-file-lines"></i> Agregar notas
-                                            </button>
-                                        </td>
-                                    }
-                                    <td>
-                                        <a href="" class="btn btn-primary btn-sm">
-                                            <i class="fa-solid fa-user-pen"></i> Editar
-                                        </a>
-                                    </td>
-                                </tr>
+                                                <tr>
+                                                    <td class="scope">@item.carnet</td>
+                                                    <td>@item.alumno</td>
+                                                    @for (int i = 0; i < 3; i++)
+                                                    {
+                                                        string trimestreActual = trimestres[i];
+                                                        bool notaExiste = yaGuardadas.Any(n =>
+                                                            n.alumno_id == item.alumno_id &&
+                                                            n.materia_id == item.materia_id &&
+                                                            n.trimestres == trimestreActual);
+                                                        <!--bool permisoExiste = permisoActivado.Any(n =>
+                                                                    n.alumno_id == item.alumno_id &&
+        n.materia_id == item.materia_id &&
+                n.Periodo == trimestreActual);-->
+
+                                                        <td>
+                                                            <button class="btn btn-dark btn-sm" id="notas"
+                                                                    data-alumnoid="@item.alumno_id"
+                                                                    data-materiaid="@item.materia_id"
+                                                                    name="@trimestreActual"
+                                                                    data-bs-toggle="modal" data-bs-target="#AgregarNotasModal"
+                                                                    @(notaExiste ? "disabled" : "")>
+                                                                <i class="fas fa-file-lines"></i> Agregar notas
+                                                            </button>
+                                                        </td>
+                                                    }
+                                                    <td>
+                                                        <a href="" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#EditarNotasModal">
+                                                            <i class="fa-solid fa-user-pen"></i> Editar
+                                                        </a>
+                                                    </td>
+                                                </tr>
                             }
                         }
                     </tbody>
@@ -175,58 +273,144 @@
             </div>
             <div class="modal-body">
                 <table class="table">
-                <thead>
-                    <tr>
-                        <td class="scope">Periodo</td>
-                        <td>Notas 1°</td>
-                        <td>Notas 2°</td>
-                        <td>Notas 3°</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="scope">1° trimestre</td>
-                        <td>
-                            @Html.TextBoxFor(m => m.nota1, new
-                            {
-                                @class = "form-control",
-                               type = "number",
-                               min = "0.1",
-                               max = "10",
-                               step = "0.1",
-                               placeholder = "9.5"
-                       })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(m => m.nota2, new
-                            {
-                                @class = "form-control",
-                                type = "number",
-                                min = "0.1",
-                                max = "10",
-                                step = "0.1",
-                                placeholder = "9.5"
-                             })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(m => m.nota3, new
-                            {
-                                @class = "form-control",
-                               type = "number",
-                               min = "0.1",
-                               max = "10",
-                               step = "0.1",
-                               placeholder = "9.5"
-                            })
-                        </td>
-                    </tr>
-                               
-                </tbody>
+                    <thead>
+                        <tr>
+                            <td class="scope">Periodo</td>
+                            <td>Notas 1°</td>
+                            <td>Notas 2°</td>
+                            <td>Notas 3°</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @using (Html.BeginForm("IngresoNotas", "notas", FormMethod.Post, htmlAttributes: new { id = "formNotas" }))
+                        {
+                            <tr>
+                                <td class="scope"><span id="trimestre"></span></td>
+                                <td>
+                                    @Html.TextBoxFor(m => m.nota1, new
+                               {
+                                   @class = "form-control",
+                                   type = "number",
+                                   min = "0.1",
+                                   max = "10",
+                                   step = "0.1",
+                                   placeholder = "9.5",
+                                   id = "txtNota1"
+                               })
+                                </td>
+                                <td>
+                                    @Html.TextBoxFor(m => m.nota2, new
+                               {
+                                   @class = "form-control",
+                                   type = "number",
+                                   min = "0.1",
+                                   max = "10",
+                                   step = "0.1",
+                                   placeholder = "9.5",
+                                   id = "txtNota2"
+                               })
+                                </td>
+                                <td>
+                                    @Html.TextBoxFor(m => m.nota3, new
+                               {
+                                   @class = "form-control",
+                                   type = "number",
+                                   min = "0.1",
+                                   max = "10",
+                                   step = "0.1",
+                                   placeholder = "9.5",
+                                   id = "txtNota3"
+                               })
+                                </td>
+                            </tr>
+                            @Html.HiddenFor(x => x.materia_id, new
+                               {
+                                   name = "materiaId",
+                                id = "materiaId",
+                                value = ""
+                               })
+                            @Html.HiddenFor(x => x.alumno_id, new
+                               {
+                                   name = "alumnoId",
+                                id = "alumnoId",
+                                value = ""
+                               })
+                            @Html.HiddenFor(x => x.anio_escolar_id, new
+                               {
+                                   name = "anioEscolar",
+                                id = "anioEscolar",
+                                value = ""
+                               })
+                            @Html.HiddenFor(x => x.trimestres, new
+                               {
+                                   name = "trimestresInput",
+                                   id = "trimestresInput",
+                                   value = ""
+                               })
+                        }
+                    </tbody>
                 </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-outline-success">Guardar notas</button>
+                <input type="button" name="boton" value="Guardar" id="btnGuardar" class="btn btn-outline-success" />
+            </div>
+        </div>
+    </div>
+</div>
+<!-- EditarNotasModal -->
+<div class="modal fade" id="EditarNotasModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edición notas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td class="scope">Periodo</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @using (Html.BeginForm("EditarNotas", "notas", FormMethod.Post, htmlAttributes: new { id = "formNotasEditar" }))
+                        {
+                            <tr>
+                                <td class="scope">Aqui metere un dropdownlist Para que le liste los trimestres, desde el modelo futuro NotasEditar</td>
+                            </tr>
+                            <!--Estos hidden tambien deberan de hacer referencia al modelo nuevo-->
+                            @Html.HiddenFor(x => x.alumno_id, new
+                               {
+                                   name = "materiaId",
+                                id = "materiaId",
+                                value = ""
+                               })
+                            @Html.HiddenFor(x => x.materia_id, new
+                               {
+                                   name = "alumnoId",
+                                id = "alumnoId",
+                                value = ""
+                               })
+                            @Html.HiddenFor(x => x.trimestres, new
+                               {
+                                   name = "trimestresInput",
+                                   id = "trimestresInput",
+                                   value = ""
+                               })
+                            @Html.HiddenFor(x => x.anio_escolar_id, new
+                               {
+                                    name = "anioEscolar",
+                                    id = "anioEscolar",
+                                    value = ""
+                               })
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="button" name="boton" value="Editar" id="btnGuardar" class="btn btn-success"/>
             </div>
         </div>
     </div>
