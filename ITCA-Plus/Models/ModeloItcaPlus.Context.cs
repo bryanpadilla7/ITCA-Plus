@@ -27,7 +27,6 @@ namespace ITCA_Plus.Models
     
         public virtual DbSet<Alumno> Alumno { get; set; }
         public virtual DbSet<AlumnoResponsable> AlumnoResponsable { get; set; }
-        public virtual DbSet<AniosEscolares> AniosEscolares { get; set; }
         public virtual DbSet<Asistencia> Asistencia { get; set; }
         public virtual DbSet<Docente> Docente { get; set; }
         public virtual DbSet<DocenteGradoMateria> DocenteGradoMateria { get; set; }
@@ -44,5 +43,6 @@ namespace ITCA_Plus.Models
         public virtual DbSet<vw_MateriasAsignadasDocente> vw_MateriasAsignadasDocente { get; set; }
         public virtual DbSet<vw_NotasAnualesPorAlumno> vw_NotasAnualesPorAlumno { get; set; }
         public virtual DbSet<vw_NotasPorAlumno> vw_NotasPorAlumno { get; set; }
+        public virtual DbSet<notiCambioNota> notiCambioNota { get; set; }
     }
 }

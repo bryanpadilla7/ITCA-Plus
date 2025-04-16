@@ -12,18 +12,19 @@ namespace ITCA_Plus.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class AniosEscolares
+    public partial class notiCambioNota
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public AniosEscolares()
-        {
-            this.Notas = new HashSet<Notas>();
-        }
-    
         public int id { get; set; }
-        public string anio { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Notas> Notas { get; set; }
+        public int docente_id { get; set; }
+        public string nombre_docente { get; set; }
+        public int materia_id { get; set; }
+        public string nombre_materia { get; set; }
+        public int alumno_id { get; set; }
+        public string nombre_alumno { get; set; }
+        public string trimestres { get; set; }
+        public bool permiso { get; set; }
+        public string motivo { get; set; }
+        public Nullable<System.DateTime> fechaSolicitud { get; set; }
+        public Nullable<System.DateTime> fechaCierre { get; set; }
     }
 }

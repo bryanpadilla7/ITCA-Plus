@@ -21,11 +21,10 @@ namespace ITCA_Plus.Models
         public Nullable<decimal> nota2 { get; set; }
         public Nullable<decimal> nota3 { get; set; }
         public string trimestres { get; set; }
-        public Nullable<int> anio_escolar_id { get; set; }
         public Nullable<decimal> promedio { get; set; }
+        public Nullable<int> anio_escolar { get; set; }
     
         public virtual Alumno Alumno { get; set; }
-        public virtual AniosEscolares AniosEscolares { get; set; }
         public virtual Materia Materia { get; set; }
     }
 }

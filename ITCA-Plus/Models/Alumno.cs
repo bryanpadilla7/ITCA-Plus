@@ -28,7 +28,7 @@ namespace ITCA_Plus.Models
         public string nombre { get; set; }
         public Nullable<System.DateTime> fecha_nacimiento { get; set; }
         public string genero { get; set; }
-        public string fotografia { get; set; }
+        public byte[] fotografia { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AlumnoResponsable> AlumnoResponsable { get; set; }

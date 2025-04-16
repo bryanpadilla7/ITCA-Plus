@@ -19,7 +19,7 @@ namespace ITCA_Plus.Models
         public string alumno { get; set; }
         public string materia { get; set; }
         public string grado { get; set; }
-        public string anio_escolar { get; set; }
+        public Nullable<int> anio_escolar { get; set; }
         public Nullable<decimal> Trimestre1 { get; set; }
         public Nullable<decimal> Trimestre2 { get; set; }
         public Nullable<decimal> Trimestre3 { get; set; }
