@@ -17,8 +17,9 @@ namespace ITCA_Plus.Models
         public int id { get; set; }
         public Nullable<int> alumno_id { get; set; }
         public Nullable<int> grado_id { get; set; }
+        public Nullable<int> anio_escolar { get; set; }
     
-        public virtual Alumno Alumno { get; set; }
         public virtual Grado Grado { get; set; }
+        public virtual Alumno Alumno { get; set; }
     }
 }

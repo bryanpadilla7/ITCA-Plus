@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="0bc4899c526540d2bc86bfe95457713f" Name="Diagram1">
+        <EntityTypeShape EntityType="ITCAPlusModel.Alumno" Width="1.5" PointX="0.75" PointY="2.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.AlumnoResponsable" Width="1.5" PointX="6" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.Asistencia" Width="1.5" PointX="3" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.Docente" Width="1.5" PointX="3.75" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.DocenteGradoMateria" Width="1.5" PointX="6" PointY="6.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.DocenteMateria" Width="1.5" PointX="6" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.Grado" Width="1.5" PointX="0.75" PointY="15.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.GradoAlumno" Width="1.5" PointX="6" PointY="10.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.Materia" Width="1.5" PointX="0.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.Notas" Width="1.5" PointX="3" PointY="2.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.notiCambioNota" Width="1.5" PointX="8.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.PeriodoEscolar" Width="1.5" PointX="8.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.Responsable" Width="1.5" PointX="3.75" PointY="13.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.Usuarios" Width="1.5" PointX="1.5" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.vw_AlumnosPorMateriaGrado" Width="1.5" PointX="8.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.vw_ListadoAsistencia" Width="1.5" PointX="10.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.vw_MateriasAsignadasDocente" Width="1.5" PointX="10.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.vw_NotasAnualesPorAlumno" Width="1.5" PointX="10.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ITCAPlusModel.vw_NotasPorAlumno" Width="1.5" PointX="12.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="ITCAPlusModel.FK__AlumnoRes__alumn__4AB81AF0" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__Asistenci__alumn__5AEE82B9" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__GradoAlum__anio___4E88ABD4" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__Notas__anio_esco__66603565" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__AlumnoRes__respo__4BAC3F29" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__Asistenci__grado__5CD6CB2B" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__Asistenci__mater__5BE2A6F2" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__Docente__usuario__3B75D760" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__DocenteGr__anio___5629CD9C" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__DocenteMa__docen__52593CB8" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__DocenteGr__grado__5812160E" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__DocenteGr__mater__571DF1D5" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__DocenteMa__mater__534D60F1" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__GradoAlum__grado__4F7CD00D" ManuallyRouted="false" />
+        <AssociationConnector Association="ITCAPlusModel.FK__Notas__materia_i__6754599E" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

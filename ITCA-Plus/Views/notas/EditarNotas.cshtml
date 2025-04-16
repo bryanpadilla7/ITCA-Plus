@@ -1,0 +1,134 @@
+﻿
+@{
+    ViewBag.Title = "EditarNotas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    @model ITCA_Plus.Models.notiCambioNota
+    var nombredoc = ViewBag.nombreDoc;
+    var idmateria = ViewBag.idMateria;
+    var nomMate = ViewBag.nombreMateria;
+    var idDoc = ViewBag.idDoc;
+    var idalum = ViewBag.idAlum;
+    var nomalum = ViewBag.nombreAlum;
+    
+
+}
+
+<script>
+    $(document).ready(function () {
+        $('#materiaId').val("@idmateria");
+        $('#nombreMate').val("@nomMate");
+        $('#alumnoId').val("@idalum");
+        $('#nomAlum').val("@nomalum");
+        $('#nombreDoc').val("@nombredoc.nombre");
+        $('#docenteId').val("@idDoc");
+        $('#permiso').val("false");
+        var fecha = obtenerFechaActual();
+        $('#fechasoli').val(fecha);
+    });
+    function obtenerFechaActual() {
+        const hoy = new Date();
+        const anio = hoy.getFullYear();
+        const mes = String(hoy.getMonth() + 1).padStart(2, '0'); // Mes empieza en 0
+        const dia = String(hoy.getDate()).padStart(2, '0');
+        return `${anio}/${mes}/${dia}`;
+    }
+    function enviarForm() {
+        var periodo = $("#txtTrimestres").val(); // Usá .val() para selects
+        var motivo = $("#txtMotivo").val();
+        var materiaID = $('#materiaId').val();
+        var nomMate = $('#nombreMate').val();
+        var alumId = $('#alumnoId').val();
+        var nomalum = $('#nomAlum').val();
+        var nomdoc = $('#nombreDoc').val();
+        var docentId = $('#docenteId').val();
+
+        if (!periodo || !motivo || !materiaID || !nomMate || !alumId || !nomalum || !nomdoc || !docentId) {
+            alert("Todos los campos son requeridos");
+            return;
+        }
+
+        var formData = $("#formNotasEditar").serialize();
+        console.log(formData)
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GuardarSolicitudNotas", "notas")',
+            data: formData,
+            success: function (response) {
+                if (response === "Guardadas") {
+                    alert("Haz enviado una solicitud con éxito!");
+                    location.reload();
+                } else {
+                    alert("Acción cancelada.");
+                }
+            },
+            error: function () {
+                alert("Error al procesar la solicitud.");
+            }
+        });
+    }
+</script>
+<h2>Petición de edición de Notas</h2>
+
+<div class="container">
+    @using (Html.BeginForm("GuardarSolicitudNotas", "notas", FormMethod.Post, new { id = "formNotasEditar" }))
+    {
+        @Html.LabelFor(x => x.trimestres, "Periodo a editar:", htmlAttributes: new { @class = "label label-info" })
+        @Html.DropDownListFor(x => x.trimestres, (IEnumerable<SelectListItem>)ViewBag.trimestres, htmlAttributes: new { @class = "form-control", id = "txtTrimestres" })<br />
+        @Html.LabelFor(x => x.motivo, "Indica la razón:", htmlAttributes: new { @class = "label label-info" })
+        @Html.TextBoxFor(x => x.motivo, new
+        {
+       @class = "form-control",
+       id = "txtMotivo"
+    })
+        @Html.HiddenFor(x => x.materia_id, new
+    {
+       id = "materiaId",
+       value = ""
+    })
+        @Html.HiddenFor(x => x.nombre_materia, new
+    {
+       id = "nombreMate",
+       value = ""
+    })
+        @Html.HiddenFor(x => x.alumno_id, new
+    {
+       name = "alumnoId",
+       id = "alumnoId",
+       value = ""
+    })
+        @Html.HiddenFor(x => x.nombre_alumno, new
+    {
+       id = "nomAlum",
+       value = ""
+    })
+        @Html.HiddenFor(x => x.nombre_docente, new
+    {
+       id = "nombreDoc",
+       value = ""
+    })
+        @Html.HiddenFor(x => x.docente_id, new
+    {
+       id = "docenteId",
+       value = ""
+    })
+        @Html.HiddenFor(x => x.permiso, new
+        {
+        id = "permiso",
+        value = ""
+        })
+        @Html.HiddenFor(x => x.fechaSolicitud, new
+{
+id = "fechasoli",
+value = ""
+})
+        <input type="submit" name="boton" value="Enviar solicitud" id="btnGuardar" class="btn btn-success mt-4" />
+    }
+
+
+
+
+
+</div>
+
+
+

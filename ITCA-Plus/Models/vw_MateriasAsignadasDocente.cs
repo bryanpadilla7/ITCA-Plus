@@ -21,5 +21,6 @@ namespace ITCA_Plus.Models
         public int grado_id { get; set; }
         public string grado_nombre { get; set; }
         public Nullable<byte> nivel { get; set; }
+        public Nullable<int> anio_escolar { get; set; }
     }
 }

@@ -7,21 +7,24 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ITCA_Plus.Models
+namespace ITCA_Plus
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class vw_AlumnosPorMateriaGrado
+    public partial class Notas
     {
-        public Nullable<int> docente_id { get; set; }
-        public Nullable<int> grado_id { get; set; }
+        public int id { get; set; }
+        public Nullable<int> alumno_id { get; set; }
         public Nullable<int> materia_id { get; set; }
-        public int alumno_id { get; set; }
-        public string carnet { get; set; }
-        public string alumno { get; set; }
-        public string grado { get; set; }
-        public string materia { get; set; }
+        public Nullable<decimal> nota1 { get; set; }
+        public Nullable<decimal> nota2 { get; set; }
+        public Nullable<decimal> nota3 { get; set; }
+        public string trimestres { get; set; }
+        public Nullable<decimal> promedio { get; set; }
         public Nullable<int> anio_escolar { get; set; }
+    
+        public virtual Alumno Alumno { get; set; }
+        public virtual Materia Materia { get; set; }
     }
 }

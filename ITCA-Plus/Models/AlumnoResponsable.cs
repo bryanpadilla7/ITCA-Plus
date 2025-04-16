@@ -18,7 +18,7 @@ namespace ITCA_Plus.Models
         public Nullable<int> alumno_id { get; set; }
         public Nullable<int> responsable_id { get; set; }
     
-        public virtual Alumno Alumno { get; set; }
         public virtual Responsable Responsable { get; set; }
+        public virtual Alumno Alumno { get; set; }
     }
 }

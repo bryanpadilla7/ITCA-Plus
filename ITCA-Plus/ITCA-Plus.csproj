@@ -140,9 +140,6 @@
     <Compile Include="Models\AlumnoResponsable.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\AniosEscolares.cs">
-      <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Asistencia.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
@@ -180,6 +177,9 @@
       <DependentUpon>ModeloItcaPlus.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\Notas.cs">
+      <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\notiCambioNota.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\PeriodoEscolar.cs">
@@ -278,6 +278,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\notas\CuadroCalificaciones.cshtml" />
     <Content Include="Views\notas\CertificadoNotas.cshtml" />
+    <Content Include="Views\notas\EditarNotas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ITCA_Plus.Models
+namespace ITCA_Plus
 {
     using System;
     using System.Collections.Generic;

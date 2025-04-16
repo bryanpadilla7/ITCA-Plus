@@ -7,36 +7,31 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ITCA_Plus.Models
+namespace ITCA_Plus
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Alumno
+    public partial class Grado
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Alumno()
+        public Grado()
         {
-            this.AlumnoResponsable = new HashSet<AlumnoResponsable>();
             this.Asistencia = new HashSet<Asistencia>();
+            this.DocenteGradoMateria = new HashSet<DocenteGradoMateria>();
             this.GradoAlumno = new HashSet<GradoAlumno>();
-            this.Notas = new HashSet<Notas>();
         }
     
         public int id { get; set; }
-        public string carnet { get; set; }
         public string nombre { get; set; }
-        public Nullable<System.DateTime> fecha_nacimiento { get; set; }
-        public string genero { get; set; }
-        public byte[] fotografia { get; set; }
+        public string seccion { get; set; }
+        public Nullable<byte> nivel { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AlumnoResponsable> AlumnoResponsable { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Asistencia> Asistencia { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<GradoAlumno> GradoAlumno { get; set; }
+        public virtual ICollection<DocenteGradoMateria> DocenteGradoMateria { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Notas> Notas { get; set; }
+        public virtual ICollection<GradoAlumno> GradoAlumno { get; set; }
     }
 }

@@ -5,7 +5,15 @@
     @model ITCA_Plus.Models.Notas
     var Listado = ViewBag.ListadoPorMateriaGrado as List<ITCA_Plus.Models.vw_AlumnosPorMateriaGrado>;
     var yaGuardadas = ViewBag.NotasYaGuadadas as List<ITCA_Plus.Models.Notas>;
+    var permisoActivado = ViewBag.permisoEdicion as List<ITCA_Plus.Models.notiCambioNota>;
     string[] trimestres = { "Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre" };
+}
+<!--Respuesta de vista editar-->
+@if (TempData["msj"]?.ToString() == "Se guardo")
+{
+    <script>
+        alert("Se guardó la solicitud de cambio");
+    </script>
 }
 <!--Acciones para visualizaciones-->
 <script>
@@ -83,9 +91,10 @@
                 alumnoId = $('#alumDList').val();
                 materiaId = $('#materiaDList').val();
             }
+            var anioActual = new Date().getFullYear();
             $('#alumnoId').val(alumnoId);
             $('#materiaId').val(materiaId);
-            $('#anioEscolar').val(1);
+            $('#anioEscolar').val(anioActual);
             $('#trimestresInput').val(trimestre);
             console.log(materiaId)
             // Consultar si ya existen notas
@@ -135,7 +144,7 @@
         var boton = $("#btnGuardar").val();
         var formData = datos.serialize() + "&boton=" + boton;
 
-        
+
          $.ajax({
              type: "POST",
              url: '@Url.Action("IngresoNotas", "notas")',
@@ -217,38 +226,49 @@
                         @{
                             foreach (ITCA_Plus.Models.vw_AlumnosPorMateriaGrado item in Listado)
                             {
-                                                <tr>
-                                                    <td class="scope">@item.carnet</td>
-                                                    <td>@item.alumno</td>
-                                                    @for (int i = 0; i < 3; i++)
-                                                    {
-                                                        string trimestreActual = trimestres[i];
-                                                        bool notaExiste = yaGuardadas.Any(n =>
-                                                            n.alumno_id == item.alumno_id &&
-                                                            n.materia_id == item.materia_id &&
-                                                            n.trimestres == trimestreActual);
-                                                        <!--bool permisoExiste = permisoActivado.Any(n =>
-                                                                    n.alumno_id == item.alumno_id &&
-        n.materia_id == item.materia_id &&
-                n.Periodo == trimestreActual);-->
+                                <tr>
+                                    <td class="scope">@item.carnet</td>
+                                    <td>@item.alumno</td>
+                                    @for (int i = 0; i < 3; i++)
+                                    {
+                                        string trimestreActual = trimestres[i];
+                                        // Revisa si existen notas para ese alumno con esta materia
+                                        bool notaExiste = yaGuardadas.Any(n =>
+                                            n.alumno_id == item.alumno_id &&
+                                            n.materia_id == item.materia_id &&
+                                            n.trimestres == trimestreActual);
 
-                                                        <td>
-                                                            <button class="btn btn-dark btn-sm" id="notas"
-                                                                    data-alumnoid="@item.alumno_id"
-                                                                    data-materiaid="@item.materia_id"
-                                                                    name="@trimestreActual"
-                                                                    data-bs-toggle="modal" data-bs-target="#AgregarNotasModal"
-                                                                    @(notaExiste ? "disabled" : "")>
-                                                                <i class="fas fa-file-lines"></i> Agregar notas
-                                                            </button>
-                                                        </td>
-                                                    }
-                                                    <td>
-                                                        <a href="" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#EditarNotasModal">
-                                                            <i class="fa-solid fa-user-pen"></i> Editar
-                                                        </a>
-                                                    </td>
-                                                </tr>
+                                        // ¿Existe una solicitud de cambio con permiso habilitado?
+                                        bool permisoHabilitado = permisoActivado.Any(n =>
+                                            n.alumno_id == item.alumno_id &&
+                                            n.materia_id == item.materia_id &&
+                                            n.trimestres == trimestreActual &&
+                                            n.permiso == true);
+
+                                        // Si ya hay nota y no hay permiso habilitado → deshabilitar botón
+                                        bool deshabilitar = notaExiste && !permisoHabilitado;
+
+
+                                        <td>
+                                            <button class="btn btn-dark btn-sm" id="notas"
+                                                    data-alumnoid="@item.alumno_id"
+                                                    data-materiaid="@item.materia_id"
+                                                    name="@trimestreActual"
+                                                    data-bs-toggle="modal" data-bs-target="#AgregarNotasModal"
+                                                    @(deshabilitar? "disabled" : "")>
+                                                <i class="fas fa-file-lines"></i> Agregar notas
+                                            </button>
+                                        </td>
+                                    }
+                                    <td>
+
+                                        <a href="@Url.Action("EditarNotas","notas", new { idMateria = item.materia_id, nombreMateria = item.materia,
+                                                                                                          idDoc= item.docente_id,
+                                                                                                      idAlum= item.alumno_id, nombreAlum = item.alumno})" class="btn btn-primary btn-sm">
+                                            <i class="fa-solid fa-user-pen"></i> Editar
+                                        </a>
+                                    </td>
+                                </tr>
                             }
                         }
                     </tbody>
@@ -335,7 +355,7 @@
                                 id = "alumnoId",
                                 value = ""
                                })
-                            @Html.HiddenFor(x => x.anio_escolar_id, new
+                            @Html.HiddenFor(x => x.anio_escolar, new
                                {
                                    name = "anioEscolar",
                                 id = "anioEscolar",
@@ -354,63 +374,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <input type="button" name="boton" value="Guardar" id="btnGuardar" class="btn btn-outline-success" />
-            </div>
-        </div>
-    </div>
-</div>
-<!-- EditarNotasModal -->
-<div class="modal fade" id="EditarNotasModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Edición notas</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <td class="scope">Periodo</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @using (Html.BeginForm("EditarNotas", "notas", FormMethod.Post, htmlAttributes: new { id = "formNotasEditar" }))
-                        {
-                            <tr>
-                                <td class="scope">Aqui metere un dropdownlist Para que le liste los trimestres, desde el modelo futuro NotasEditar</td>
-                            </tr>
-                            <!--Estos hidden tambien deberan de hacer referencia al modelo nuevo-->
-                            @Html.HiddenFor(x => x.alumno_id, new
-                               {
-                                   name = "materiaId",
-                                id = "materiaId",
-                                value = ""
-                               })
-                            @Html.HiddenFor(x => x.materia_id, new
-                               {
-                                   name = "alumnoId",
-                                id = "alumnoId",
-                                value = ""
-                               })
-                            @Html.HiddenFor(x => x.trimestres, new
-                               {
-                                   name = "trimestresInput",
-                                   id = "trimestresInput",
-                                   value = ""
-                               })
-                            @Html.HiddenFor(x => x.anio_escolar_id, new
-                               {
-                                    name = "anioEscolar",
-                                    id = "anioEscolar",
-                                    value = ""
-                               })
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <input type="button" name="boton" value="Editar" id="btnGuardar" class="btn btn-success"/>
             </div>
         </div>
     </div>

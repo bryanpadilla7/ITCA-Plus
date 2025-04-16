@@ -14,6 +14,7 @@ namespace ITCA_Plus.Controllers
     {
         ITCAPlusEntities contexto = new ITCAPlusEntities();
         int userActualID = 1;
+        int anioActual = DateTime.Now.Year;
         public void llenarCmb(int cmb)
         {
             switch (cmb)
@@ -43,7 +44,7 @@ namespace ITCA_Plus.Controllers
         public JsonResult ObtenerAlumnosPorGrado(int grado, int mat)
         {
             var alumnos = contexto.vw_AlumnosPorMateriaGrado.Where(x => x.docente_id == userActualID
-                && x.materia_id == mat && x.grado_id == grado).Select(x => new SelectListItem
+                && x.materia_id == mat && x.grado_id == grado && x.anio_escolar== anioActual).Select(x => new SelectListItem
                 {
                     Text = x.alumno,
                     Value = x.alumno_id.ToString(),
@@ -55,7 +56,7 @@ namespace ITCA_Plus.Controllers
         public JsonResult ObtenerMaterias(int grado)
         {
             var materias = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID
-            && x.grado_id == grado)
+            && x.grado_id == grado && x.anio_escolar == anioActual)
                 .Select(x => new SelectListItem
                 {
                     Text = x.materia_nombre,
@@ -77,9 +78,9 @@ namespace ITCA_Plus.Controllers
         {
             if (ModelState.IsValid)
             {
-                /*Aqui debo de agregar la sentencia de buscar en la tabla NotasEditar si ya me dieron permiso de edicion o no
-                ViewBag.permisoEdicion = contexto.NotasEditar.Where(x => x.permiso == 1)
-                */
+
+                ViewBag.permisoEdicion = contexto.notiCambioNota.Where(x => x.permiso == true).ToList();
+                
                 ViewBag.NotasYaGuadadas = contexto.Notas.Where(x => x.trimestres == "Primer Trimestre" 
                 || x.trimestres == "Segundo Trimestre" || x.trimestres == "Tercer Trimestre").ToList();
                     ModelState.Remove("grado");
@@ -87,13 +88,13 @@ namespace ITCA_Plus.Controllers
                     if (alumno != 0)
                     {
                         var notas = contexto.vw_AlumnosPorMateriaGrado.Where(n => n.grado_id == grado
-                              && n.materia_id == materia && n.alumno_id == alumno).ToList();
+                              && n.materia_id == materia && n.alumno_id == alumno && n.anio_escolar == anioActual).ToList();
                         ViewBag.ListadoPorMateriaGrado = notas;
                     }
                     else
                     {
                         var notas = contexto.vw_AlumnosPorMateriaGrado.Where(n => n.grado_id == grado
-                            && n.materia_id == materia).ToList();
+                            && n.materia_id == materia && n.anio_escolar == anioActual).ToList();
                         ViewBag.ListadoPorMateriaGrado = notas;
                     }
             }
@@ -113,10 +114,10 @@ namespace ITCA_Plus.Controllers
                     resultado = "Guardadas";
                     break;
                 case "Editar":
-                    Notas temp = contexto.Notas.FirstOrDefault(x => x.alumno_id == n.alumno_id && x.materia_id == n.materia_id && x.anio_escolar_id == n.anio_escolar_id);
+                    Notas temp = contexto.Notas.FirstOrDefault(x => x.alumno_id == n.alumno_id && x.materia_id == n.materia_id && x.anio_escolar == n.anio_escolar);
                     temp.alumno_id = n.alumno_id;
                     temp.materia_id = n.materia_id;
-                    temp.anio_escolar_id = n.anio_escolar_id;
+                    temp.anio_escolar = n.anio_escolar;
                     temp.nota1 = n.nota1;
                     temp.nota2 = n.nota2;
                     temp.nota3 = n.nota3;
@@ -140,13 +141,28 @@ namespace ITCA_Plus.Controllers
            
             return Json(resultado);
         }
+       
 
-        [HttpPost]
-        public JsonResult EditarNotas()
+        public ActionResult EditarNotas(int idMateria, string nombreMateria, int idDoc, int idAlum, string nombreAlum)
         {
-
-            string resultado = "";
-            return Json(resultado);
+            ViewBag.idMateria = idMateria;
+            ViewBag.nombreMateria = "Mate";
+            ViewBag.idDoc = idDoc;
+            ViewBag.idAlum = idAlum;
+            ViewBag.nombreAlum = nombreAlum;
+            var nombreDoc= contexto.Usuarios.FirstOrDefault(d => d.id == idDoc);
+            ViewBag.nombreDoc = nombreDoc;
+            llenarCmb(2);
+            return View();  
+        }
+        [HttpPost]
+        public ActionResult GuardarSolicitudNotas(notiCambioNota edi)
+        {
+                contexto.notiCambioNota.Add(edi);
+                contexto.SaveChanges();
+            TempData["msj"] = "Se guardo";
+                return RedirectToAction("CuadroCalificaciones");
+             
         }
         public ActionResult CertificadoNotas()
         {
