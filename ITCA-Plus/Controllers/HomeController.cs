@@ -11,6 +11,7 @@ namespace ITCA_Plus.Controllers
     {
         public ActionResult Index()
         {
+            Session["rolUser"] = "Admin";
             return View();
         }
 

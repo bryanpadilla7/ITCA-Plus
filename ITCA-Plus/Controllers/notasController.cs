@@ -15,6 +15,7 @@ namespace ITCA_Plus.Controllers
         ITCAPlusEntities contexto = new ITCAPlusEntities();
         int userActualID = 1;
         int anioActual = DateTime.Now.Year;
+        DateTime fecha = DateTime.Now;
         public void llenarCmb(int cmb)
         {
             switch (cmb)
@@ -28,8 +29,22 @@ namespace ITCA_Plus.Controllers
                             Value = x.grado_id.ToString()
                         }).Distinct()
                         .ToList();
+                    if(Session["rolUser"] == "Admin"){
+                        var listaDocentes = (from d in contexto.Docente
+                                             join u in contexto.Usuarios on d.usuario_id equals u.id
+                                             select new SelectListItem
+                                             {
+                                                 Value = d.id.ToString(),
+                                                 Text = u.nombre
+                                             }).ToList();
+
+                        ViewBag.cmbDocentes = listaDocentes;
+                    }
+                    
+
                     break;
                 case 2:
+                    
                     ViewBag.trimestres = new List<SelectListItem>
                 {
                    new SelectListItem { Text = "Primer Trimestre", Value="Primer Trimestre"},
@@ -114,6 +129,7 @@ namespace ITCA_Plus.Controllers
                     resultado = "Guardadas";
                     break;
                 case "Editar":
+                    //Aqui trae el dato para modificarlo por el nuevo.
                     Notas temp = contexto.Notas.FirstOrDefault(x => x.alumno_id == n.alumno_id && x.materia_id == n.materia_id && x.anio_escolar == n.anio_escolar);
                     temp.alumno_id = n.alumno_id;
                     temp.materia_id = n.materia_id;
@@ -121,6 +137,11 @@ namespace ITCA_Plus.Controllers
                     temp.nota1 = n.nota1;
                     temp.nota2 = n.nota2;
                     temp.nota3 = n.nota3;
+                    contexto.SaveChanges();
+                    //Aqui vamos a modificar al notiCambios para que me desahibilite el btn otra ves
+                    notiCambioNota edi = contexto.notiCambioNota.FirstOrDefault(x => x.alumno_id == n.alumno_id && x.materia_id == n.materia_id && x.trimestres == n.trimestres && x.docente_id == userActualID);
+                    edi.permiso = false;
+                    edi.fechaCierre = fecha;
                     contexto.SaveChanges();
                     resultado = "Modificadas";
                     break;
@@ -131,28 +152,39 @@ namespace ITCA_Plus.Controllers
         [HttpPost]
         public JsonResult NotasGuardadas(int materia, int alumno, string trimestre)
         {
-            List<Notas> data = contexto.Notas.Where(x => x.alumno_id == alumno && x.materia_id == materia && x.trimestres == trimestre).ToList();
+            var data = contexto.Notas.FirstOrDefault(x => x.alumno_id == alumno && x.materia_id == materia && x.trimestres == trimestre);
             ViewBag.data = data;
-            string resultado = "";
-            if (data.Count() > 0)
+            if (data != null)
             {
-                 resultado = "Existe";
+                return Json(new
+                {
+                    existe = true,
+                    nota1 = data.nota1,
+                    nota2 = data.nota2,
+                    nota3 = data.nota3
+                },  JsonRequestBehavior.AllowGet);
             }
-           
-            return Json(resultado);
+            else
+            {
+                return Json(new { existe = false }, JsonRequestBehavior.AllowGet);
+            }
         }
        
 
         public ActionResult EditarNotas(int idMateria, string nombreMateria, int idDoc, int idAlum, string nombreAlum)
         {
             ViewBag.idMateria = idMateria;
-            ViewBag.nombreMateria = "Mate";
+            ViewBag.nombreMateria = nombreMateria;
             ViewBag.idDoc = idDoc;
             ViewBag.idAlum = idAlum;
             ViewBag.nombreAlum = nombreAlum;
             var nombreDoc= contexto.Usuarios.FirstOrDefault(d => d.id == idDoc);
             ViewBag.nombreDoc = nombreDoc;
-            llenarCmb(2);
+            ViewBag.trimestres = contexto.Notas.Where(est => est.alumno_id == idAlum && est.materia_id == idMateria).Select(x => new SelectListItem
+            {
+                Text = x.trimestres,
+                Value = x.trimestres.ToString()
+            }).ToList();
             return View();  
         }
         [HttpPost]

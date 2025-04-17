@@ -28,107 +28,73 @@
     function obtenerFechaActual() {
         const hoy = new Date();
         const anio = hoy.getFullYear();
-        const mes = String(hoy.getMonth() + 1).padStart(2, '0'); // Mes empieza en 0
+        const mes = String(hoy.getMonth() + 1).padStart(2, '0'); 
         const dia = String(hoy.getDate()).padStart(2, '0');
         return `${anio}/${mes}/${dia}`;
     }
-    function enviarForm() {
-        var periodo = $("#txtTrimestres").val(); // Usá .val() para selects
-        var motivo = $("#txtMotivo").val();
-        var materiaID = $('#materiaId').val();
-        var nomMate = $('#nombreMate').val();
-        var alumId = $('#alumnoId').val();
-        var nomalum = $('#nomAlum').val();
-        var nomdoc = $('#nombreDoc').val();
-        var docentId = $('#docenteId').val();
-
-        if (!periodo || !motivo || !materiaID || !nomMate || !alumId || !nomalum || !nomdoc || !docentId) {
-            alert("Todos los campos son requeridos");
-            return;
-        }
-
-        var formData = $("#formNotasEditar").serialize();
-        console.log(formData)
-        $.ajax({
-            type: "POST",
-            url: '@Url.Action("GuardarSolicitudNotas", "notas")',
-            data: formData,
-            success: function (response) {
-                if (response === "Guardadas") {
-                    alert("Haz enviado una solicitud con éxito!");
-                    location.reload();
-                } else {
-                    alert("Acción cancelada.");
-                }
-            },
-            error: function () {
-                alert("Error al procesar la solicitud.");
-            }
-        });
-    }
 </script>
 <h2>Petición de edición de Notas</h2>
-
-<div class="container">
-    @using (Html.BeginForm("GuardarSolicitudNotas", "notas", FormMethod.Post, new { id = "formNotasEditar" }))
-    {
-        @Html.LabelFor(x => x.trimestres, "Periodo a editar:", htmlAttributes: new { @class = "label label-info" })
-        @Html.DropDownListFor(x => x.trimestres, (IEnumerable<SelectListItem>)ViewBag.trimestres, htmlAttributes: new { @class = "form-control", id = "txtTrimestres" })<br />
-        @Html.LabelFor(x => x.motivo, "Indica la razón:", htmlAttributes: new { @class = "label label-info" })
-        @Html.TextBoxFor(x => x.motivo, new
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="card" style="width: 800px;">
+        <h5 class="card-header text-center" style="background-color: #aeb6bf;">Petición para editar campo</h5>
+        <div class="card-body">
+            @using (Html.BeginForm("GuardarSolicitudNotas", "notas", FormMethod.Post, new { id = "formNotasEditar"}))
+            {
+                @Html.LabelFor(x => x.trimestres, "Periodo a editar:", htmlAttributes: new { @class = "label label-info" })
+                @Html.DropDownListFor(x => x.trimestres, (IEnumerable<SelectListItem>)ViewBag.trimestres, "Seleccionar Periodo a editar", htmlAttributes: new { @class = "form-control", id = "txtTrimestres", style = "max-width: none;" })<br />
+                @Html.LabelFor(x => x.motivo, "Indica la razón:", htmlAttributes: new { @class = "label label-info", style = "max-width: none;" })
+                @Html.TextAreaFor(x => x.motivo, 5, 1, new
+           {
+               @class = "form-control",
+               id = "txtMotivo",
+               placeholder = "Indica el motivo de tu petición",
+               style = "max-width: none;"
+           })
+                @Html.HiddenFor(x => x.materia_id, new
+            {
+               id = "materiaId",
+               value = ""
+            })
+                @Html.HiddenFor(x => x.nombre_materia, new
+            {
+               id = "nombreMate",
+               value = ""
+            })
+                @Html.HiddenFor(x => x.alumno_id, new
+            {
+               name = "alumnoId",
+               id = "alumnoId",
+               value = ""
+            })
+                @Html.HiddenFor(x => x.nombre_alumno, new
+            {
+               id = "nomAlum",
+               value = ""
+            })
+                @Html.HiddenFor(x => x.nombre_docente, new
+            {
+               id = "nombreDoc",
+               value = ""
+            })
+                @Html.HiddenFor(x => x.docente_id, new
+            {
+               id = "docenteId",
+               value = ""
+            })
+                @Html.HiddenFor(x => x.permiso, new
+                {
+                id = "permiso",
+                value = ""
+                })
+                @Html.HiddenFor(x => x.fechaSolicitud, new
         {
-       @class = "form-control",
-       id = "txtMotivo"
-    })
-        @Html.HiddenFor(x => x.materia_id, new
-    {
-       id = "materiaId",
-       value = ""
-    })
-        @Html.HiddenFor(x => x.nombre_materia, new
-    {
-       id = "nombreMate",
-       value = ""
-    })
-        @Html.HiddenFor(x => x.alumno_id, new
-    {
-       name = "alumnoId",
-       id = "alumnoId",
-       value = ""
-    })
-        @Html.HiddenFor(x => x.nombre_alumno, new
-    {
-       id = "nomAlum",
-       value = ""
-    })
-        @Html.HiddenFor(x => x.nombre_docente, new
-    {
-       id = "nombreDoc",
-       value = ""
-    })
-        @Html.HiddenFor(x => x.docente_id, new
-    {
-       id = "docenteId",
-       value = ""
-    })
-        @Html.HiddenFor(x => x.permiso, new
-        {
-        id = "permiso",
+        id = "fechasoli",
         value = ""
         })
-        @Html.HiddenFor(x => x.fechaSolicitud, new
-{
-id = "fechasoli",
-value = ""
-})
-        <input type="submit" name="boton" value="Enviar solicitud" id="btnGuardar" class="btn btn-success mt-4" />
-    }
-
-
-
-
-
+                <input type="submit" name="boton" value="Enviar solicitud" id="btnGuardar" class="btn btn-warning mt-4" />
+            }
+        </div>
+    </div>
 </div>
-
 
 

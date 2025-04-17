@@ -107,15 +107,24 @@
                     trimestre: trimestre
                 },
                 success: function (response) {
-                    if (response == "Existe") {
+                    if (response.existe == true) {
+                        // Rellenar los campos del modal
+                        $("#txtNota1").val(response.nota1);
+                        $("#txtNota2").val(response.nota2);
+                        $("#txtNota3").val(response.nota3);
+                        console.log(response)
                         $("#btnGuardar").val("Editar");
                         $("#btnGuardar").attr("class", "btn btn-outline-primary");
-                        $("#btnGuardar").attr("onclick", "enviarForm()");
                     } else {
+                        // Limpiar los campos si no hay datos
+                        $("#txtNota1").val("");
+                        $("#txtNota2").val("");
+                        $("#txtNota3").val("");
+                        console.log(response)
                         $("#btnGuardar").val("Guardar");
                         $("#btnGuardar").attr("class", "btn btn-outline-success");
-                        $("#btnGuardar").attr("onclick", "enviarForm()");
                     }
+                    $("#btnGuardar").attr("onclick", "enviarForm()");
                 },
                 error: function () {
                     alert("Error al verificar existencia de notas.");
@@ -169,6 +178,9 @@
 
 
 <h2>Cuadro de Calificaciones</h2>
+<p>
+    @Session["rolUser"]
+</p>
 <!--Card filtradora de listado-->
 <div class="container d-flex justify-content-center align-items-center">
     <div class="card" style="width: 800px;">
@@ -177,6 +189,13 @@
             <!-- Formulario para agregar notas por alumno-->
             @using (Html.BeginForm("CuadroCalificaciones", "notas", System.Web.Mvc.FormMethod.Post))
             {
+                if (Session["rolUser"] == "Admin")
+                {
+                    <div class="mb-3">
+                        @Html.Label("Docente:")
+                        @Html.DropDownList("docente", (IEnumerable<SelectListItem>)ViewBag.cmbDocentes, "Seleccione docente", htmlAttributes: new { @class = "form-control", required = "required", id = "docenteId", style = "max-width: none;" })
+                    </div>
+                }
                 <div class="mb-3">
                     @Html.Label("Grado:")
                     @Html.DropDownList("grado", (IEnumerable<SelectListItem>)ViewBag.cmbGrado, "Seleccione grado", htmlAttributes: new { @class = "form-control", required = "required", id = "gradoDList", style = "max-width: none;" })
@@ -210,77 +229,98 @@
         <div class="card-body">
             @if (ViewBag.ListadoPorMateriaGrado != null && Listado.Any())
             {
+                <div class="table-responsive">
+                    <table class="table table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <td>Carnet</td>
+                                <td>Nombre Alumno</td>
+                                <td>Notas 1° Trimestre</td>
+                                <td>Notas 2° Trimestre</td>
+                                <td>Notas 3° Trimestre</td>
+                                <td>Acciones</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (ITCA_Plus.Models.vw_AlumnosPorMateriaGrado item in Listado)
+                                {
+                                    <tr>
+                                        <td class="scope">@item.carnet</td>
+                                        <td>@item.alumno</td>
+                                        @for (int i = 0; i < 3; i++)
+                                        {
+                                            string trimestreActual = trimestres[i];
+                                            if (Session["rolUser"] != "Admin")
+                                            {
 
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <td>Carnet</td>
-                            <td>Nombre Alumno</td>
-                            <td>Notas 1° Trimestre</td>
-                            <td>Notas 2° Trimestre</td>
-                            <td>Notas 3° Trimestre</td>
-                            <td>Acciones</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            foreach (ITCA_Plus.Models.vw_AlumnosPorMateriaGrado item in Listado)
-                            {
-                                <tr>
-                                    <td class="scope">@item.carnet</td>
-                                    <td>@item.alumno</td>
-                                    @for (int i = 0; i < 3; i++)
-                                    {
-                                        string trimestreActual = trimestres[i];
-                                        // Revisa si existen notas para ese alumno con esta materia
-                                        bool notaExiste = yaGuardadas.Any(n =>
-                                            n.alumno_id == item.alumno_id &&
-                                            n.materia_id == item.materia_id &&
-                                            n.trimestres == trimestreActual);
+                                                // Revisa si existen notas para ese alumno con esta materia
+                                                bool notaExiste = yaGuardadas.Any(n =>
+                                                    n.alumno_id == item.alumno_id &&
+                                                    n.materia_id == item.materia_id &&
+                                                    n.trimestres == trimestreActual);
 
-                                        // ¿Existe una solicitud de cambio con permiso habilitado?
-                                        bool permisoHabilitado = permisoActivado.Any(n =>
-                                            n.alumno_id == item.alumno_id &&
-                                            n.materia_id == item.materia_id &&
-                                            n.trimestres == trimestreActual &&
-                                            n.permiso == true);
+                                                // ¿Existe una solicitud de cambio con permiso habilitado?
+                                                bool permisoHabilitado = permisoActivado.Any(n =>
+                                                    n.alumno_id == item.alumno_id &&
+                                                    n.materia_id == item.materia_id &&
+                                                    n.trimestres == trimestreActual &&
+                                                    n.permiso == true);
 
-                                        // Si ya hay nota y no hay permiso habilitado → deshabilitar botón
-                                        bool deshabilitar = notaExiste && !permisoHabilitado;
+                                                // Si ya hay nota y no hay permiso habilitado → deshabilitar botón
+                                                bool deshabilitar = notaExiste && !permisoHabilitado;
 
 
-                                        <td>
-                                            <button class="btn btn-dark btn-sm" id="notas"
-                                                    data-alumnoid="@item.alumno_id"
-                                                    data-materiaid="@item.materia_id"
-                                                    name="@trimestreActual"
-                                                    data-bs-toggle="modal" data-bs-target="#AgregarNotasModal"
-                                                    @(deshabilitar? "disabled" : "")>
-                                                <i class="fas fa-file-lines"></i> Agregar notas
-                                            </button>
-                                        </td>
-                                    }
-                                    <td>
+                                                <td>
+                                                    <button class="btn btn-dark btn-sm" id="notas"
+                                                            data-alumnoid="@item.alumno_id"
+                                                            data-materiaid="@item.materia_id"
+                                                            name="@trimestreActual"
+                                                            data-bs-toggle="modal" data-bs-target="#AgregarNotasModal"
+                                                            @(deshabilitar ? "disabled" : "")>
+                                                        <i class="fas fa-file-lines"></i> Configurar notas
+                                                    </button>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+                                                    <button class="btn btn-dark btn-sm" id="notas"
+                                                            data-alumnoid="@item.alumno_id"
+                                                            data-materiaid="@item.materia_id"
+                                                            name="@trimestreActual"
+                                                            data-bs-toggle="modal" data-bs-target="#AgregarNotasModal">
+                                                        <i class="fas fa-file-lines"></i> Configurar notas
+                                                    </button>
+                                                </td>
+                                            }
+                                        }
+                                        @if (Session["rolUser"] != "Admin")
+                                        {
+                                            <td>
 
-                                        <a href="@Url.Action("EditarNotas","notas", new { idMateria = item.materia_id, nombreMateria = item.materia,
-                                                                                                          idDoc= item.docente_id,
-                                                                                                      idAlum= item.alumno_id, nombreAlum = item.alumno})" class="btn btn-primary btn-sm">
-                                            <i class="fa-solid fa-user-pen"></i> Editar
-                                        </a>
-                                    </td>
-                                </tr>
+                                                <a href="@Url.Action("EditarNotas","notas", new { idMateria = item.materia_id, nombreMateria = item.materia,
+                                                                       idDoc= item.docente_id,
+                                                                   idAlum= item.alumno_id, nombreAlum = item.alumno})" class="btn btn-primary btn-sm">
+                                                    <i class="fa-solid fa-user-pen"></i> Editar
+                                                </a>
+                                            </td>
+                                        }
+
+                                    </tr>
+
+                                }
                             }
-                        }
-                    </tbody>
-                </table>
-
+                        </tbody>
+                    </table>
+                </div>
                 <script>
                     document.getElementById('alumno').style.display = 'block';
                     document.getElementById('materia').style.display = 'block';
                 </script>
             }
         </div>
-    </div>
+            </div>
 </div>
 
 <!-- AgregarNotasModal -->
