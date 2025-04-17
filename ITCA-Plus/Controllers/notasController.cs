@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Reflection;
 using System.Web;
@@ -16,11 +17,9 @@ namespace ITCA_Plus.Controllers
         int userActualID = 1;
         int anioActual = DateTime.Now.Year;
         DateTime fecha = DateTime.Now;
-        public void llenarCmb(int cmb)
+        public void llenarCmb()
         {
-            switch (cmb)
-            {
-                case 1:
+            
                     //cmbGrado
                     ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID)
                         .Select(x => new SelectListItem
@@ -42,17 +41,7 @@ namespace ITCA_Plus.Controllers
                     }
                     
 
-                    break;
-                case 2:
                     
-                    ViewBag.trimestres = new List<SelectListItem>
-                {
-                   new SelectListItem { Text = "Primer Trimestre", Value="Primer Trimestre"},
-                   new SelectListItem { Text = "Segundo Trimestre", Value="Segundo Trimestre"},
-                   new SelectListItem { Text = "Tercer Trimestre", Value="Tercer Trimestre"},
-                };
-                    break;
-            }
             
         }
         [HttpPost]
@@ -85,7 +74,7 @@ namespace ITCA_Plus.Controllers
         // GET: notas
         public ActionResult CuadroCalificaciones()
         {
-            llenarCmb(1);
+            llenarCmb();
             return View();
         }
         [HttpPost]
@@ -99,7 +88,7 @@ namespace ITCA_Plus.Controllers
                 ViewBag.NotasYaGuadadas = contexto.Notas.Where(x => x.trimestres == "Primer Trimestre" 
                 || x.trimestres == "Segundo Trimestre" || x.trimestres == "Tercer Trimestre").ToList();
                     ModelState.Remove("grado");
-                    llenarCmb(1);
+                    llenarCmb();
                     if (alumno != 0)
                     {
                         var notas = contexto.vw_AlumnosPorMateriaGrado.Where(n => n.grado_id == grado
@@ -169,10 +158,23 @@ namespace ITCA_Plus.Controllers
                 return Json(new { existe = false }, JsonRequestBehavior.AllowGet);
             }
         }
-       
+
 
         public ActionResult EditarNotas(int idMateria, string nombreMateria, int idDoc, int idAlum, string nombreAlum)
         {
+            var trimestresEnNotiCambio = contexto.notiCambioNota.Where(x => x.alumno_id == idAlum &&  x.materia_id == idMateria && x.docente_id == userActualID)
+                                     .Select(x => x.trimestres)
+                                     .ToList();
+
+            var lista = contexto.Notas
+                .Where(d => !trimestresEnNotiCambio.Contains(d.trimestres))
+                .Select(d => new SelectListItem
+                {
+                    Value = d.id.ToString(),
+                    Text = d.trimestres
+                })
+                .Distinct()
+                .ToList();
             ViewBag.idMateria = idMateria;
             ViewBag.nombreMateria = nombreMateria;
             ViewBag.idDoc = idDoc;
@@ -180,11 +182,7 @@ namespace ITCA_Plus.Controllers
             ViewBag.nombreAlum = nombreAlum;
             var nombreDoc= contexto.Usuarios.FirstOrDefault(d => d.id == idDoc);
             ViewBag.nombreDoc = nombreDoc;
-            ViewBag.trimestres = contexto.Notas.Where(est => est.alumno_id == idAlum && est.materia_id == idMateria).Select(x => new SelectListItem
-            {
-                Text = x.trimestres,
-                Value = x.trimestres.ToString()
-            }).ToList();
+            ViewBag.trimestres = lista;
             return View();  
         }
         [HttpPost]
@@ -196,23 +194,7 @@ namespace ITCA_Plus.Controllers
                 return RedirectToAction("CuadroCalificaciones");
              
         }
-        public ActionResult CertificadoNotas()
-        {
-            List<Alumno> data = contexto.Alumno.ToList();
-            //enviar a la lista
-            ViewBag.data = data;
-            return View();
-        }
-        /*[HttpPost]  
-        public ActionResult CertificadoNotas()
-        {
-            if (ModelState.IsValid)
-            {
-                // Procesar la lógica de guardado
-                // Redirigir a otra acción o devolver una vista
-            }
-            return View();
-        }*/
+        
     }
 
 }
