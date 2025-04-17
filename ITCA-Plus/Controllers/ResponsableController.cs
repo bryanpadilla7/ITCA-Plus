@@ -71,14 +71,63 @@ namespace ITCA_Plus.Controllers
 
             return View(model);
         }
-        public ActionResult Responsable()
+        public ActionResult Responsable(int id)
         {
-            return View();
+            ViewBag.cmbParentesco = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Padre", Value="Padre"},
+                new SelectListItem { Text = "Madre", Value="Madre"},
+                new SelectListItem { Text = "Otro", Value="Otro"}
+            };
+
+            var alumno = contexto.Alumno.FirstOrDefault(a => a.id == id);
+            ViewBag.nombreAlumno = alumno?.nombre;
+
+            var relacion = contexto.AlumnoResponsable
+                .FirstOrDefault(ar => ar.alumno_id == id);
+
+            ResponsableViewModel model = new ResponsableViewModel
+            {
+                AlumnoId = id
+            };
+
+            if(relacion != null)
+            {
+                var responsable = contexto.Responsable
+                    .FirstOrDefault(r => r.id == relacion.responsable_id);
+
+                if (responsable != null)
+                {
+                    model.nombre = responsable.nombre;
+                    model.parentesco = responsable.parentesco;
+                    model.telefono = responsable.telefono;
+                    model.direccion = responsable.direccion;
+                }
+            }
+
+            return View(model);
         }
 
         [HttpPost]
-        public ActionResult EditarResponsable()
+        public ActionResult EditarResponsable(ResponsableViewModel model)
         {
+            var relacion = contexto.AlumnoResponsable
+                .FirstOrDefault(ar => ar.alumno_id == model.AlumnoId);
+
+            if(relacion != null)
+            {
+                var responsable = contexto.Responsable
+                    .FirstOrDefault(r => r.id == relacion.responsable_id);
+
+                if (responsable != null)
+                {
+                    responsable.nombre = model.nombre;
+                    responsable.parentesco = model.parentesco;
+                    responsable.telefono = model.telefono;
+                    responsable.direccion = model.direccion;
+                    contexto.SaveChanges();
+                }
+            }
             return RedirectToAction("Alumnos", "Alumno");
         }
     }
