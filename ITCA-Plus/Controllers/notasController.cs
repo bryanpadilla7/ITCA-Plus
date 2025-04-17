@@ -14,20 +14,13 @@ namespace ITCA_Plus.Controllers
     public class notasController : Controller
     {
         ITCAPlusEntities contexto = new ITCAPlusEntities();
-        int userActualID = 1;
+        int userActualID = 2;
         int anioActual = DateTime.Now.Year;
         DateTime fecha = DateTime.Now;
         public void llenarCmb()
         {
             
-                    //cmbGrado
-                    ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID)
-                        .Select(x => new SelectListItem
-                        {
-                            Text = x.grado_nombre,
-                            Value = x.grado_id.ToString()
-                        }).Distinct()
-                        .ToList();
+                    
                     if(Session["rolUser"] == "Admin"){
                         var listaDocentes = (from d in contexto.Docente
                                              join u in contexto.Usuarios on d.usuario_id equals u.id
@@ -38,37 +31,88 @@ namespace ITCA_Plus.Controllers
                                              }).ToList();
 
                         ViewBag.cmbDocentes = listaDocentes;
-                    }
+                //cmbGrado
+                ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente
+                    .Select(x => new SelectListItem
+                    {
+                        Text = x.grado_nombre,
+                        Value = x.grado_id.ToString()
+                    }).Distinct()
+                    .ToList();
+            }
+            else
+            {
+                //cmbGrado
+                ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID)
+                    .Select(x => new SelectListItem
+                    {
+                        Text = x.grado_nombre,
+                        Value = x.grado_id.ToString()
+                    }).Distinct()
+                    .ToList();
+            }
                     
 
                     
             
         }
         [HttpPost]
-        public JsonResult ObtenerAlumnosPorGrado(int grado, int mat)
+        public JsonResult ObtenerAlumnosPorGrado(int grado, int mat, int docente =0)
         {
-            var alumnos = contexto.vw_AlumnosPorMateriaGrado.Where(x => x.docente_id == userActualID
-                && x.materia_id == mat && x.grado_id == grado && x.anio_escolar== anioActual).Select(x => new SelectListItem
+            if (Session["rolUser"] == "Admin")
+            {
+                var alumnos = contexto.vw_AlumnosPorMateriaGrado.Where(x => x.docente_id == docente
+                && x.materia_id == mat && x.grado_id == grado && x.anio_escolar == anioActual).Select(x => new SelectListItem
                 {
                     Text = x.alumno,
                     Value = x.alumno_id.ToString(),
                 }).ToList();
 
-            return Json(alumnos, JsonRequestBehavior.AllowGet);
+                return Json(alumnos, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                var alumnos = contexto.vw_AlumnosPorMateriaGrado.Where(x => x.docente_id == userActualID
+                && x.materia_id == mat && x.grado_id == grado && x.anio_escolar == anioActual).Select(x => new SelectListItem
+                {
+                    Text = x.alumno,
+                    Value = x.alumno_id.ToString(),
+                }).ToList();
+
+                return Json(alumnos, JsonRequestBehavior.AllowGet);
+            }
+                
         }
         [HttpPost]
-        public JsonResult ObtenerMaterias(int grado)
+        public JsonResult ObtenerMaterias(int grado, int docente=0)
         {
-            var materias = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID
-            && x.grado_id == grado && x.anio_escolar == anioActual)
-                .Select(x => new SelectListItem
-                {
-                    Text = x.materia_nombre,
-                    Value = x.materia_id.ToString()
-                }).Distinct()
-                .ToList();
+            if (Session["rolUser"] == "Admin")
+            {
+                var materias = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == docente
+           && x.grado_id == grado && x.anio_escolar == anioActual)
+               .Select(x => new SelectListItem
+               {
+                   Text = x.materia_nombre,
+                   Value = x.materia_id.ToString()
+               }).Distinct()
+               .ToList();
+                return Json(materias, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                var materias = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID
+           && x.grado_id == grado && x.anio_escolar == anioActual)
+               .Select(x => new SelectListItem
+               {
+                   Text = x.materia_nombre,
+                   Value = x.materia_id.ToString()
+               }).Distinct()
+               .ToList();
+                return Json(materias, JsonRequestBehavior.AllowGet);
+            }
+               
 
-            return Json(materias, JsonRequestBehavior.AllowGet);
+            
         }
 
         // GET: notas
@@ -167,10 +211,12 @@ namespace ITCA_Plus.Controllers
                                      .ToList();
 
             var lista = contexto.Notas
-                .Where(d => !trimestresEnNotiCambio.Contains(d.trimestres))
+                .Where(d => d.alumno_id == idAlum
+             && d.materia_id == idMateria
+             &&!trimestresEnNotiCambio.Contains(d.trimestres))
                 .Select(d => new SelectListItem
                 {
-                    Value = d.id.ToString(),
+                    Value = d.trimestres.ToString(),
                     Text = d.trimestres
                 })
                 .Distinct()
@@ -195,6 +241,8 @@ namespace ITCA_Plus.Controllers
              
         }
         
+        
     }
+
 
 }

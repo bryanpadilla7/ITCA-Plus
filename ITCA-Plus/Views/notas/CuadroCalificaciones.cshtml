@@ -19,14 +19,16 @@
 <script>
     $(document).ready(function () {
           $("#gradoDList").on("change", function () {
-                var gradoId = $(this).val();
-
+              var gradoId = $(this).val();
+              var docente = $("#docenteId").val();
+              
                  if (gradoId != null) {
                     $.ajax({
                         url: '@Url.Action("ObtenerMaterias", "notas")',
                         type: 'POST',
                         data: {
-                            grado: gradoId
+                            grado: gradoId,
+                            docente: docente
                         },
                         success: function (data) {
                             // Limpiar y llenar el combo de alumnos
@@ -52,13 +54,15 @@
             console.log(gradoId)
              var materia = $(this).val();
              console.log(materia)
+             var docente = $("#docenteId").val();
              if (gradoId != null && materia != null) {
                 $.ajax({
                     url: '@Url.Action("ObtenerAlumnosPorGrado", "notas")',
                     type: 'POST',
                     data: {
                         grado: gradoId,
-                        mat: materia
+                        mat: materia,
+                        docente: docente
                     },
                     success: function (data) {
                         // Limpiar y llenar el combo de alumnos

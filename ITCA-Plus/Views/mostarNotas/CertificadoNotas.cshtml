@@ -4,18 +4,21 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var Listado = ViewBag.ListadoPorMateriaGrado as List<ITCA_Plus.Models.vw_AlumnosPorMateriaGrado>;
+   
+   
 }
 <script>
     $(document).ready(function () {
       $("#gradoDList").on("change", function () {
             var gradoId = $(this).val();
-
+          var docente = $("#docenteId").val();
              if (gradoId != null) {
                 $.ajax({
                     url: '@Url.Action("ObtenerMaterias", "notas")',
                     type: 'POST',
                     data: {
-                        grado: gradoId
+                        grado: gradoId,
+                        docente: docente
                     },
                     success: function (data) {
                         // Limpiar y llenar el combo de alumnos
@@ -41,13 +44,15 @@
         console.log(gradoId)
          var materia = $(this).val();
          console.log(materia)
+         var docente = $("#docenteId").val();
          if (gradoId != null && materia != null) {
             $.ajax({
                 url: '@Url.Action("ObtenerAlumnosPorGrado", "notas")',
                 type: 'POST',
                 data: {
                     grado: gradoId,
-                    mat: materia
+                    mat: materia,
+                    docente: docente
                 },
                 success: function (data) {
                     // Limpiar y llenar el combo de alumnos
@@ -71,13 +76,15 @@
         $('#NotasPorAlumnoModal').on('show.bs.modal', function (event) {
             var btnQueAbrioElModal = $(event.relatedTarget);
             let alumnoId = btnQueAbrioElModal.data('alumnoid');
-
+            let materiaId = btnQueAbrioElModal.data('materiaid');
+            console.log(materiaId)
     // traer las notas
     $.ajax({
         type: "POST",
         url: '@Url.Action("NotasPorAlumno", "mostarNotas")',
         data: {
-            alumno: alumnoId
+            alumno: alumnoId,
+            materiaid: materiaId
         },
         success: function (response) {
             if (response.existe == true) {
@@ -102,6 +109,54 @@
 
             } else {
                 $('#NotasPorAlumnoModal tbody').html(`
+            <tr><td colspan="5" class="text-center text-danger">No hay notas registradas.</td></tr>
+        `);
+            }
+        },
+        error: function () {
+            alert("Error al verificar existencia de notas.");
+        }
+    });
+
+
+});
+        $('#grupalNotasModal').on('show.bs.modal', function (event) {
+            var btnQueAbrioElModal = $(event.relatedTarget);
+            let materiaId = btnQueAbrioElModal.data('materiaid');
+            let gradoId = btnQueAbrioElModal.data('grado');
+    // traer las notas
+    $.ajax({
+        type: "POST",
+        url: '@Url.Action("NotasPorGrupo", "mostarNotas")',
+        data: {
+            materia: materiaId,
+            grado: gradoId
+        },
+        success: function (response) {
+            if (response.existe == true) {
+                var notas = response.notas;
+
+                let html = "";
+
+                $.each(notas, function (i, item) {
+                    html += `
+                <tr>
+                        <td>${item.periodo}</td>
+                        <td>${item.carnet}</td>
+                        <td>${item.nombre}</td>
+                        <td>${item.nota1}</td>
+                        <td>${item.nota2}</td>
+                        <td>${item.nota3}</td>
+                        <td>${item.prom}</td>
+                    </tr>
+            `;
+                });
+
+                // insertar en el tbody del modal
+                $('#grupalNotasModal tbody').html(html);
+
+            } else {
+                $('#grupalNotasModal tbody').html(`
             <tr><td colspan="5" class="text-center text-danger">No hay notas registradas.</td></tr>
         `);
             }
@@ -179,8 +234,11 @@
                         </thead>
                         <tbody>
                             @{
+                                int total = Listado.Count;
+                                int index = 0;
                                 foreach (ITCA_Plus.Models.vw_AlumnosPorMateriaGrado item in Listado)
                                 {
+                                    index++;
                                     <tr>
                                         <td class="scope">@item.carnet</td>
                                         <td>@item.alumno</td>
@@ -188,12 +246,25 @@
 
                                             <a href="" class="btn btn-info btn-sm"
                                                data-alumnoid="@item.alumno_id"
+                                               data-materiaid="@item.materia_id"
                                                data-bs-toggle="modal" data-bs-target="#NotasPorAlumnoModal">
                                                 <i class="fa-solid fa-eye"></i> Ver Notas
                                             </a>
                                         </td>
                                     </tr>
-
+                                    if (index == total)
+                                    {
+                        <tr class="mb-5">
+                            <td colspan="3" class="table-active">
+                                <a href="" class="btn btn-dark"
+                                   data-materiaid="@item.materia_id"
+                                    data-grado="@item.grado"
+                                   data-bs-toggle="modal" data-bs-target="#grupalNotasModal">
+                                    <i class="fa-solid fa-eye"></i> Ver Notas Grupales
+                                </a>
+                            </td>
+                        </tr>
+                                    }
                                 }
                             }
                         </tbody>
@@ -203,12 +274,12 @@
                     document.getElementById('alumno').style.display = 'block';
                     document.getElementById('materia').style.display = 'block';
                 </script>
-            }
+                                }
         </div>
     </div>
 </div>
 
-<!-- AgregarNotasModal -->
+<!-- NotasPorAlumnoModal -->
 <div class="modal fade" id="NotasPorAlumnoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -228,7 +299,40 @@
                         </tr>
                     </thead>
                     <tbody id="notas-body">
-                       
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="btnGuardar" class="btn btn-outline-danger">
+                    <i class="fa-solid fa-envelope"></i> Enviar al correo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- grupalNotasModal -->
+<div class="modal fade" id="grupalNotasModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Notas por alumno</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td class="scope">Periodo</td>
+                            <td>Carnet</td>
+                            <td>Nombre alumno</td>
+                            <td>Notas 1°</td>
+                            <td>Notas 2°</td>
+                            <td>Notas 3°</td>
+                            <td class="scope">Promedio</td>
+                        </tr>
+                    </thead>
+                    <tbody id="notas-body">
                     </tbody>
                 </table>
             </div>

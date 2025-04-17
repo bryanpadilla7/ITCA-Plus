@@ -180,6 +180,7 @@
     <Compile Include="Models\Notas.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\NotasReporteViewModel.cs" />
     <Compile Include="Models\notiCambioNota.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
@@ -280,6 +281,7 @@
     <Content Include="Views\notas\CuadroCalificaciones.cshtml" />
     <Content Include="Views\notas\EditarNotas.cshtml" />
     <Content Include="Views\mostarNotas\CertificadoNotas.cshtml" />
+    <Content Include="Views\mostarNotas\reportesEspeciales.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

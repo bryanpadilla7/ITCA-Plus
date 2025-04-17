@@ -1,0 +1,113 @@
+﻿
+@{
+    ViewBag.Title = "reportesEspeciales";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var Listado = ViewBag.listado as IEnumerable<dynamic>; ;
+}
+<script>
+        $(document).ready(function () {
+      $("#gradoDList").on("change", function () {
+          var gradoId = $(this).val();
+          console.log(gradoId)
+             if (gradoId != null) {
+                $.ajax({
+                    url: '@Url.Action("ObtenerMaterias", "mostarnotas")',
+                    type: 'POST',
+                    data: {
+                        grado: gradoId
+                    },
+                    success: function (data) {
+                        // Limpiar y llenar el combo de alumnos
+                        var $materiaDropdown = $("#materiaDList");
+                        $materiaDropdown.empty();
+                        $materiaDropdown.append('<option value="">Seleccione materia</option>');
+
+                        $.each(data, function (i, item) {
+                            $materiaDropdown.append('<option value="' + item.Value + '">' + item.Text + '</option>');
+                        });
+                    },
+                    error: function () {
+                        alert("Seleccione una opción válida");
+                    }
+                });
+            }
+        });
+});
+</script>
+<h2>Reportes</h2>
+<div class="container d-flex justify-content-center align-items-center">
+    <div class="card" style="width: 800px;">
+        <h5 class="card-header text-center" style="background-color: #aeb6bf;">Filtrar</h5>
+        <div class="card-body">
+            <!-- Formulario para agregar notas por alumno-->
+            @using (Html.BeginForm("reportesEspeciales", "mostarNotas", System.Web.Mvc.FormMethod.Post))
+            {
+                <div class="mb-3">
+                    @Html.Label("Grado:")
+                    @Html.DropDownList("grado", (IEnumerable<SelectListItem>)ViewBag.cmbGrado, "Seleccione grado", htmlAttributes: new { @class = "form-control", required = "required", id = "gradoDList", style = "max-width: none;" })
+                </div>
+
+                <div class="mb-3" id="materia" >
+                    @Html.Label("Materia:")
+                    <select id="materiaDList" name="materia" class="form-control" style="max-width: none;">
+                        <option value="">Seleccione primero un grado válido</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="anioEscolar" >
+                    @Html.Label("Año Escolar:")
+                    @Html.DropDownList("anioEscolar", (IEnumerable<SelectListItem>)ViewBag.cmbAnioReportes, "Seleccione año", htmlAttributes: new { @class = "form-control", id = "gradoDList", style = "max-width: none;" })
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                    <input type="submit" value="Buscar" class="btn btn-outline-info" style="max-width: none;" />
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="card" style="width: 800px;">
+        <h5 class="card-header text-center" style="background-color: #aeb6bf;">Resultados de la búsqueda</h5>
+        <div class="card-body">
+            @if (ViewBag.listado != null && Listado.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <td>Carnet</td>
+                                <td>Nombre Alumno</td>
+                                <td>Materia</td>
+                                <td>Trimestre 1</td>
+                                <td>Trimestre 2</td>
+                                <td>Trimestre 3</td>
+                                <td>Promedio Final</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Listado)
+                                {
+                                    var tipo = item.GetType();
+                                    <tr>
+                                        <td>@tipo.GetProperty("carnet").GetValue(item, null)</td>
+                                        <td>@tipo.GetProperty("alumno").GetValue(item, null)</td>
+                                        <td>@tipo.GetProperty("materia").GetValue(item, null)</td>
+                                        <td>@tipo.GetProperty("Trimestre1").GetValue(item, null)</td>
+                                        <td>@tipo.GetProperty("Trimestre2").GetValue(item, null)</td>
+                                        <td>@tipo.GetProperty("Trimestre3").GetValue(item, null)</td>
+                                        <td>@tipo.GetProperty("PromedioFinal").GetValue(item, null)</td>
+                                    </tr>
+
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
