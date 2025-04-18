@@ -10,7 +10,7 @@ namespace ITCA_Plus.Controllers
     public class mostarNotasController : Controller
     {
         ITCAPlusEntities contexto = new ITCAPlusEntities();
-        int userActualID =2 ;
+        int userActualID = 2;
         int anioActual = DateTime.Now.Year;
         public void llenarcmb()
         {

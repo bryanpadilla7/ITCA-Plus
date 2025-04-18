@@ -159,6 +159,7 @@
     <Compile Include="Models\GradoAlumno.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\HelperNotify.cs" />
     <Compile Include="Models\Materia.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
@@ -180,7 +181,6 @@
     <Compile Include="Models\Notas.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\NotasReporteViewModel.cs" />
     <Compile Include="Models\notiCambioNota.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>

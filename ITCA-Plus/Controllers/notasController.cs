@@ -160,6 +160,7 @@ namespace ITCA_Plus.Controllers
                     contexto.Notas.Add(n);
                     contexto.SaveChanges();
                     resultado = "Guardadas";
+                    HelperNotify.Notificar(this, "Notas guardadas con éxito", "success");
                     break;
                 case "Editar":
                     //Aqui trae el dato para modificarlo por el nuevo.
@@ -177,6 +178,7 @@ namespace ITCA_Plus.Controllers
                     edi.fechaCierre = fecha;
                     contexto.SaveChanges();
                     resultado = "Modificadas";
+                    HelperNotify.Notificar(this, "Notas modificadas con éxito", "info");
                     break;
             }
             
@@ -229,6 +231,7 @@ namespace ITCA_Plus.Controllers
             var nombreDoc= contexto.Usuarios.FirstOrDefault(d => d.id == idDoc);
             ViewBag.nombreDoc = nombreDoc;
             ViewBag.trimestres = lista;
+            
             return View();  
         }
         [HttpPost]
@@ -237,7 +240,8 @@ namespace ITCA_Plus.Controllers
                 contexto.notiCambioNota.Add(edi);
                 contexto.SaveChanges();
             TempData["msj"] = "Se guardo";
-                return RedirectToAction("CuadroCalificaciones");
+            HelperNotify.Notificar(this, "Se ha guardado la solicitud de edición", "info");
+            return RedirectToAction("CuadroCalificaciones");
              
         }
         

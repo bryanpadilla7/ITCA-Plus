@@ -8,20 +8,14 @@
     var permisoActivado = ViewBag.permisoEdicion as List<ITCA_Plus.Models.notiCambioNota>;
     string[] trimestres = { "Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre" };
 }
-<!--Respuesta de vista editar-->
-@if (TempData["msj"]?.ToString() == "Se guardo")
-{
-    <script>
-        alert("Se guardó la solicitud de cambio");
-    </script>
-}
 <!--Acciones para visualizaciones-->
 <script>
     $(document).ready(function () {
           $("#gradoDList").on("change", function () {
               var gradoId = $(this).val();
               var docente = $("#docenteId").val();
-              
+              console.log(gradoId)
+
                  if (gradoId != null) {
                     $.ajax({
                         url: '@Url.Action("ObtenerMaterias", "notas")',
@@ -44,7 +38,8 @@
                             $("#materia").show();
                         },
                         error: function () {
-                            alert("Seleccione una opción válida");
+                            alert("Seleccione una opción válida")
+
                         }
                     });
                 }
@@ -166,10 +161,12 @@
                  if (response == "Guardadas" || response == "Modificadas") {
                      $("button[data-alumnoid='" + formData.alumno_id + "'][data-materiaid='" + formData.materia_id + "'][name='" + periodo + "']")
                          .prop("disabled", true);
-                     alert("Notas " + response + " con éxito!");
+                     //alert("Notas " + response + " con éxito!");
+
+                     
                      location.reload();
                  } else {
-                     alert("Acción cancelada.");
+                      alert("Acción cancelada.");
                  }
          },
              error: function () {
