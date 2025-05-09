@@ -42,36 +42,50 @@ namespace ITCA_Plus.Controllers
             string eliminacion = Request.Form["eliminacion"].ToString();
             string modificacion = Request.Form["modificacion"].ToString();
 
-            if(fotoAlumno != null && fotoAlumno.ContentLength > 0)
-            {
-                byte[] imagenData = null;
-                using (var binaryAlumno = new BinaryReader(fotoAlumno.InputStream))
-                {
-                    imagenData = binaryAlumno.ReadBytes(fotoAlumno.ContentLength);
-                }
-                a.fotografia = imagenData;
-            }
             switch (accion)
             {
                 case "Guardar":
+                    if (fotoAlumno != null && fotoAlumno.ContentLength > 0)
+                    {
+                        using (var binaryAlumno = new BinaryReader(fotoAlumno.InputStream))
+                        {
+                            a.fotografia = binaryAlumno.ReadBytes(fotoAlumno.ContentLength);
+                        }
+                    }
+
                     a.carnet = GenerarCarnet();
                     contexto.Alumno.Add(a);
                     contexto.SaveChanges();
+                    HelperNotify.Notificar(this, "Registro agregado correctamente", "success");
                     break;
                 case "Modificar":
                     if (modificacion.Equals("si"))
                     {
                         Alumno temp = contexto.Alumno.FirstOrDefault(s => s.carnet == a.carnet);
-                        temp.nombre = a.nombre;
-                        temp.fecha_nacimiento = a.fecha_nacimiento;
-                        temp.genero = a.genero;
-                        temp.fotografia = a.fotografia;
-                        contexto.SaveChanges();
+
+                        if(temp != null)
+                        {
+                            temp.nombre = a.nombre;
+                            temp.fecha_nacimiento = a.fecha_nacimiento;
+                            temp.genero = a.genero;
+
+                            if (fotoAlumno != null && fotoAlumno.ContentLength > 0)
+                            {
+                                using (var binaryAlumno = new BinaryReader(fotoAlumno.InputStream))
+                                {
+                                    temp.fotografia = binaryAlumno.ReadBytes(fotoAlumno.ContentLength);
+                                }
+                            }
+                            contexto.SaveChanges();
+                            HelperNotify.Notificar(this, "Registro modificado correctamente", "success");
+                        }
                     }
                     break;
                 case "Eliminar":
                     contexto.Alumno.Remove(contexto.Alumno.FirstOrDefault(s => s.carnet == a.carnet));
                     contexto.SaveChanges();
+                    HelperNotify.Notificar(this, "Registro eliminado correctamente", "success");
+
                     break;
 
             }
@@ -81,6 +95,10 @@ namespace ITCA_Plus.Controllers
         public ActionResult convertirImagen(int codAlumno)
         {
             var fotoAlumno = contexto.Alumno.Where(a => a.id == codAlumno).FirstOrDefault();
+            if (fotoAlumno == null || fotoAlumno.fotografia == null)
+            {
+                return HttpNotFound("Imagen no encontrada.");
+            }
             return File(fotoAlumno.fotografia, "image/jpg");
         }
 

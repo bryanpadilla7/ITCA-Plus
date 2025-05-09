@@ -129,6 +129,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AlumnoController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MateriaController.cs" />
     <Compile Include="Controllers\notasController.cs" />
     <Compile Include="Controllers\ResponsableController.cs" />
     <Compile Include="Global.asax.cs">
@@ -158,6 +159,7 @@
     <Compile Include="Models\GradoAlumno.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\HelperNotify.cs" />
     <Compile Include="Models\Materia.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
@@ -282,6 +284,7 @@
     <Content Include="Views\Alumno\Alumnos.cshtml" />
     <Content Include="Views\Responsable\Responsables.cshtml" />
     <Content Include="Views\Responsable\Responsable.cshtml" />
+    <Content Include="Views\Materia\Asistencia.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

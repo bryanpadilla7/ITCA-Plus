@@ -10,8 +10,9 @@
     <!--LIBRERIAS EXTRAS-->
     <!--font awesome para los iconos-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
@@ -36,7 +37,15 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="gestionAlumnosDropdown">
                             <li>@Html.ActionLink("Registrar Alumno", "Alumnos", "Alumno", new { area = "" }, new { @class = "dropdown-item" })</li>
-                            <li>@Html.ActionLink("Listado de Alumnos", "Index", "Alumnos", new { area = "" }, new { @class = "dropdown-item" })</li>
+                            <!-- Agrega más elementos si lo deseas -->
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="materiasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Materias
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="materiasDropdown">
+                            <li>@Html.ActionLink("Asistencia", "Asistencia", "Materia", new { area = "" }, new { @class = "dropdown-item" })</li>
                             <!-- Agrega más elementos si lo deseas -->
                         </ul>
                     </li>
@@ -58,6 +67,6 @@
     @RenderSection("scripts", required: false)
     <!-- Agrega esto antes de cerrar </body> si aún no está funcionando -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </body>
 </html>
