@@ -12,6 +12,7 @@ namespace ITCA_Plus
     using System;
     using System.Collections.Generic;
     
+<<<<<<<< HEAD:ITCA-Plus/Usuarios.cs
     public partial class Usuarios
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -28,5 +29,21 @@ namespace ITCA_Plus
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Docente> Docente { get; set; }
+========
+    public partial class notiCambioNota
+    {
+        public int id { get; set; }
+        public int docente_id { get; set; }
+        public string nombre_docente { get; set; }
+        public int materia_id { get; set; }
+        public string nombre_materia { get; set; }
+        public int alumno_id { get; set; }
+        public string nombre_alumno { get; set; }
+        public string trimestres { get; set; }
+        public bool permiso { get; set; }
+        public string motivo { get; set; }
+        public Nullable<System.DateTime> fechaSolicitud { get; set; }
+        public Nullable<System.DateTime> fechaCierre { get; set; }
+>>>>>>>> origin/Bryan2:ITCA-Plus/Models/notiCambioNota.cs
     }
 }
