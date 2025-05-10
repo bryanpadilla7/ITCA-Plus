@@ -1,0 +1,288 @@
+﻿@model ITCA_Plus.Models.Usuarios
+
+@{
+    ViewBag.Title = "Agregar Docente";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+    $(document).ready(function() {
+        load();
+
+        function load() {
+            $.ajax({
+                url: '@Url.Action("GetDocente", "Admin")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#tbody').empty();
+                    if (data.length > 0) {
+                        data.forEach((user, index) => {
+                            $('#tbody').append(
+                                `<tr>
+                                    <td>${index + 1}</td>
+                                    <td>${user.nombre}</td>
+                                    <td>${user.tel}</td>
+                                    <td>${user.usuario}</td>
+                                    <td>${user.correo}</td>
+                                    <td>${user.Token}</td>
+                                    <td>
+                                        <a href="#" class="me-2"
+                                           style="text-decoration:none;"
+                                           onclick="cargarUpdate('${user.Token}')"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#modalDocente"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Editar">
+                                            <i class="fa-solid fa-pen fa-lg text-warning"></i>
+                                        </a>
+                                        <a href="#"
+                                           style="text-decoration:none;"
+                                           onclick="cargarDelete('${user.Token}')"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#modalDocente"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Eliminar">
+                                            <i class="fa-solid fa-trash fa-lg text-danger"></i>
+                                        </a>
+                                    </td>
+                                </tr>`
+                            );
+                        });
+
+                    } else {
+                        $('#tbody').append('<tr><td colspan="5" class="text-center">No hay docentes.</td></tr>');
+                    }
+                },
+                error: function () {
+                    alert('Error al cargar los docentes.');
+                }
+            });
+        }
+    });
+</script>
+
+
+<main class="container d-flex align-items-center justify-content-center min-vh-100">
+
+    <div class="container d-flex justify-content-center align-items-center pt-4">
+        <div class="card" style="width: 1200px;">
+            <!-- Cabecera con título y botón en la misma fila -->
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #435D7D;">
+                <h5 class="mb-0 text-white">Listado de docentes</h5>
+
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-danger">
+                        <i class="fa-solid fa-circle-minus"></i> Borrar
+                    </button>
+                    <button type="button" onclick="cargarNuevo()" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDocente" id="btnNuevo">
+                        <i class="fa-solid fa-circle-plus"></i> Agregar docente
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr style="color: #435D7D;">
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Tel</th>
+                            <th>Usuario</th>
+                            <th>Correo</th>
+                            <th>Carnet</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="modalDocente" tabindex="-1" aria-labelledby="modalDocenteLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow border-0">
+            <div class="modal-header bg-success text-white rounded-top-4">
+                <h5 class="modal-title" id="modalDocenteLabel">Agregar Docente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("AgregarDocente", "Docente", FormMethod.Post, new { id = "formDocente", enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-4">
+                        <!-- Columna izquierda -->
+                        <div class="col-md-7">
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.nombre, new { @class = "form-label" })
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                    @Html.TextBoxFor(m => m.nombre, new { @class = "form-control", placeholder = "Nombre completo", style = "max-width: none", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.nombre, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.tel, new { @class = "form-label" })
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                                    @Html.TextBoxFor(m => m.tel, new { @class = "form-control", placeholder = "0000-0000", type = "tel", style = "max-width: none", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.tel, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.correo, new { @class = "form-label" })
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                                    @Html.TextBoxFor(m => m.correo, new { @class = "form-control", placeholder = "Correo electrónico", type = "email", style = "max-width: none", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.correo, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.contrasena, new { @class = "form-label" })
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                    @Html.PasswordFor(m => m.contrasena, new { @class = "form-control", placeholder = "Contraseña", style = "max-width: none", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.contrasena, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.Label("Especialidad", new { @class = "form-label" })
+                                @Html.DropDownList("especialidad", new SelectList(new[]
+                                {
+                                    "Matemáticas", "Lenguaje", "Ciencias", "Estudios Sociales", "Educación Física", "Computación", "Arte"
+                                }), "Seleccione una especialidad", new { @class = "form-select", required = "required", style = "max-width: none" })
+                                <div class="invalid-feedback">Seleccione una especialidad válida.</div>
+                            </div>
+                        </div>
+
+                        <!-- Columna derecha -->
+                        <div class="col-md-5 text-center">
+                            <div class="mb-3">
+                                <label for="foto" class="form-label">Fotografía (opcional)</label>
+                                <input type="file" name="foto" id="foto" class="form-control" accept="image/*" onchange="mostrarPreview(event) " style="max-width: none" />
+                            </div>
+                            <div class="mb-3 border rounded" style="max-height: 200px;  height: 200px; overflow: hidden; ">
+                                <img id="previewFoto" src="#" class="img-thumbnail d-none" style="max-height: 200px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-3">
+                        <button type="submit" class="btn btn-success rounded-pill">
+                            <i class="bi bi-plus-circle me-2"></i> Registrar Docente
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const modalElement = document.getElementById("modalDocente");
+
+    if (modalElement) {
+        modalElement.addEventListener("hidden.bs.modal", function () {
+            const form = document.getElementById("formDocente");
+            if (form) form.reset();
+
+            const fotoPreview = document.getElementById("previewFoto");
+            if (fotoPreview) {
+                fotoPreview.src = "#";
+                fotoPreview.classList.add("d-none");
+            }
+
+            // Limpia validaciones visuales
+            const inputs = document.querySelectorAll('#formDocente .is-invalid, #formDocente .is-valid');
+            inputs.forEach(input => {
+                input.classList.remove('is-invalid', 'is-valid');
+            });
+
+            // Quitar mensajes de validación
+            const validationSpans = form.querySelectorAll('.field-validation-error, .text-danger');
+            validationSpans.forEach(span => span.innerHTML = '');
+
+            form.classList.remove('was-validated');
+            });
+        }
+    });
+</script>
+
+
+
+
+<script>
+    function mostrarPreview(event) {
+        const input = event.target;
+        const preview = document.getElementById("previewFoto");
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove("d-none");
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+</script>
+
+
+<script>
+    (() => {
+        'use strict';
+        const forms = document.querySelectorAll('form')
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const telInput = document.getElementById('tel');
+
+        // Máscara en tiempo real
+        telInput.addEventListener('input', function () {
+            let value = telInput.value.replace(/\D/g, ''); // solo dígitos
+            if (value.length > 4) {
+                value = value.slice(0, 4) + '-' + value.slice(4, 8);
+            }
+            telInput.value = value.slice(0, 9); // máx. 9 caracteres con guion
+        });
+
+        // Al enviar el formulario, se remueve el guion
+        const form = telInput.closest('form');
+        form.addEventListener('submit', function () {
+            telInput.value = telInput.value.replace(/-/g, '');
+        });
+    });
+</script>
+
+
+

@@ -21,8 +21,8 @@ namespace ITCA_Plus.Models
         public Nullable<bool> presente { get; set; }
         public Nullable<int> grado_id { get; set; }
     
+        public virtual Alumno Alumno { get; set; }
         public virtual Grado Grado { get; set; }
         public virtual Materia Materia { get; set; }
-        public virtual Alumno Alumno { get; set; }
     }
 }

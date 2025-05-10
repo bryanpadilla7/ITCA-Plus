@@ -12,6 +12,7 @@ namespace ITCA_Plus.Models
     using System;
     using System.Collections.Generic;
     
+    using System.ComponentModel.DataAnnotations;
     public partial class Usuarios
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -21,9 +22,20 @@ namespace ITCA_Plus.Models
         }
     
         public int id { get; set; }
+        [Required(ErrorMessage = "El nombre es obligatorio")]  
         public string nombre { get; set; }
+        [Required(ErrorMessage = "El telefono es obligatorio")]
+        public string tel { get; set; }
+        [Required(ErrorMessage = "El usuario es obligatorio")]
         public string usuario { get; set; }
+        [Required(ErrorMessage = "El correo es obligatorio")]
+        public string correo { get; set; }
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
         public string contrasena { get; set; }
+        public Nullable<bool> restablecer { get; set; }
+        public Nullable<bool> confirmar { get; set; }
+        public string Token { get; set; }
+        public byte[] fotografia { get; set; }
         public string rol { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

@@ -24,7 +24,7 @@ namespace ITCA_Plus.Models
         public string trimestres { get; set; }
         public bool permiso { get; set; }
         public string motivo { get; set; }
-        public System.DateTime fechaSolicitud { get; set; }
+        public Nullable<System.DateTime> fechaSolicitud { get; set; }
         public Nullable<System.DateTime> fechaCierre { get; set; }
     }
 }

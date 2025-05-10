@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewBag.Title = "ResEnvio";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+@model ITCA_Plus.Models.Usuarios
+
+@if (ViewBag.mensaje != null)
+{
+    <script>
+        const mensaje = @Html.Raw(Json.Encode(ViewBag.mensaje));
+        Swal.fire({
+            icon: 'info',
+            title: '¡Información!',
+            text: mensaje,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#3085d6'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (mensaje.startsWith("Se ha enviado un correo a")) {
+                    window.location.href = '@Url.Action("Login", "Account")';
+                }
+            }
+        });
+    </script>
+}
+
+
+<main class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="card shadow border-0 p-4 rounded-4" style="max-width: 450px; width: 100%;">
+        <div class="card-body">
+            <h3 class="text-center mb-4">Bienvenido</h3>
+            <p class="text-center text-muted mb-4">Busca tu correo para restablecer la contraseña</p>
+
+            @using (Html.BeginForm("ResEnvio", "Account", FormMethod.Post, new { id = "loginForm" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.correo, "Correo", new { @class = "form-label" })
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                        @Html.TextBoxFor(m => m.correo, new { @class = "form-control", placeholder = "Correo", style = "max-width: none" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.correo, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary rounded-pill">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Buscar correo
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</main>

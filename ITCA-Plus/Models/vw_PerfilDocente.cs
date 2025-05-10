@@ -12,13 +12,16 @@ namespace ITCA_Plus.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class AlumnoResponsable
+    public partial class vw_PerfilDocente
     {
-        public int id { get; set; }
-        public Nullable<int> alumno_id { get; set; }
-        public Nullable<int> responsable_id { get; set; }
-    
-        public virtual Alumno Alumno { get; set; }
-        public virtual Responsable Responsable { get; set; }
+        public int docente_id { get; set; }
+        public int usuario_id { get; set; }
+        public string nombre_docente { get; set; }
+        public string telefono { get; set; }
+        public string usuario_login { get; set; }
+        public string correo { get; set; }
+        public string rol { get; set; }
+        public string especialidad { get; set; }
+        public byte[] fotografia { get; set; }
     }
 }

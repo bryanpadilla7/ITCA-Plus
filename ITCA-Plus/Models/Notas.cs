@@ -24,7 +24,7 @@ namespace ITCA_Plus.Models
         public Nullable<decimal> promedio { get; set; }
         public Nullable<int> anio_escolar { get; set; }
     
-        public virtual Materia Materia { get; set; }
         public virtual Alumno Alumno { get; set; }
+        public virtual Materia Materia { get; set; }
     }
 }

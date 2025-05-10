@@ -25,6 +25,7 @@ namespace ITCA_Plus.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Alumno> Alumno { get; set; }
         public virtual DbSet<AlumnoResponsable> AlumnoResponsable { get; set; }
         public virtual DbSet<Asistencia> Asistencia { get; set; }
         public virtual DbSet<Docente> Docente { get; set; }
@@ -34,15 +35,15 @@ namespace ITCA_Plus.Models
         public virtual DbSet<GradoAlumno> GradoAlumno { get; set; }
         public virtual DbSet<Materia> Materia { get; set; }
         public virtual DbSet<Notas> Notas { get; set; }
+        public virtual DbSet<notiCambioNota> notiCambioNota { get; set; }
         public virtual DbSet<PeriodoEscolar> PeriodoEscolar { get; set; }
         public virtual DbSet<Responsable> Responsable { get; set; }
         public virtual DbSet<Usuarios> Usuarios { get; set; }
         public virtual DbSet<vw_AlumnosPorMateriaGrado> vw_AlumnosPorMateriaGrado { get; set; }
         public virtual DbSet<vw_ListadoAsistencia> vw_ListadoAsistencia { get; set; }
         public virtual DbSet<vw_MateriasAsignadasDocente> vw_MateriasAsignadasDocente { get; set; }
-        public virtual DbSet<notiCambioNota> notiCambioNota { get; set; }
         public virtual DbSet<vw_NotasAnualesPorAlumno> vw_NotasAnualesPorAlumno { get; set; }
         public virtual DbSet<vw_NotasPorAlumno> vw_NotasPorAlumno { get; set; }
-        public virtual DbSet<Alumno> Alumno { get; set; }
+        public virtual DbSet<vw_PerfilDocente> vw_PerfilDocente { get; set; }
     }
 }
