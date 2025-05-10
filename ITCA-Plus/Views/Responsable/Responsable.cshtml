@@ -1,0 +1,46 @@
+﻿@model ITCA_Plus.Models.ResponsableViewModel
+@{
+    ViewBag.Title = "Responsable";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Editar</h2>
+<div class="container d-flex justify-content-center align-items-center">
+    <div class="card" style="width:700px">
+        <div class="card-header text-center text-white" style="background-color: #435D7D;">
+            <h3>Actualizar información del responsable de:</h3>
+            <h3>@ViewBag.nombreAlumno.ToUpper()</h3>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("EditarResponsable", "Responsable", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.AlumnoId)
+                <div class="row">
+                    <div class="col-md-6">
+                        @Html.Label("Nombre del responsable")
+                        @Html.TextBoxFor(r => r.nombre, new { @class = "form-control", style = "max-width: none;", id = "txtNombre", required = "required" })
+                    </div>
+                    <div class="col-md-6">
+                        <label>Parentesco</label>
+                        @Html.DropDownListFor(r => r.parentesco, (IEnumerable<SelectListItem>)ViewBag.cmbParentesco, new { @class = "form-control", style = "max-width: none;", id = "txtParentesco", required = "required" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        @Html.Label("Teléfono")
+                        @Html.TextBoxFor(r => r.telefono, new { @class = "form-control", style = "max-width: none;", id = "txtTelefono", required = "required" })
+                    </div>
+                    <div class="col-md-6">
+                        <label>Direccion</label>
+                        @Html.TextBoxFor(r => r.direccion, new { @class = "form-control", style = "max-width: none;", id = "txtDireccion", required = "required" })
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-3">
+                    <input type="submit" value="Guardar" class="btn btn-outline-primary" style="max-width: none;" />
+                    <a href="@Url.Action("Alumnos", "Alumno")" class="btn btn-outline-danger" style="max-width: none;">Cancelar</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
