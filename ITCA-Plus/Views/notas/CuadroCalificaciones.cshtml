@@ -7,6 +7,7 @@
     var yaGuardadas = ViewBag.NotasYaGuadadas as List<ITCA_Plus.Models.Notas>;
     var permisoActivado = ViewBag.permisoEdicion as List<ITCA_Plus.Models.notiCambioNota>;
     string[] trimestres = { "Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre" };
+    var cliente = Session["cuenta"] as ITCA_Plus.Models.Usuarios;
 }
 <!--Acciones para visualizaciones-->
 <script>
@@ -180,7 +181,7 @@
 
 <h2>Cuadro de Calificaciones</h2>
 <p>
-    @Session["rolUser"]
+    @cliente.rol
 </p>
 <!--Card filtradora de listado-->
 <div class="container d-flex justify-content-center align-items-center">
@@ -190,7 +191,7 @@
             <!-- Formulario para agregar notas por alumno-->
             @using (Html.BeginForm("CuadroCalificaciones", "notas", System.Web.Mvc.FormMethod.Post))
             {
-                if (Session["rolUser"] == "Admin")
+                if (cliente.rol == "Admin")
                 {
                     <div class="mb-3">
                         @Html.Label("Docente:")
@@ -252,7 +253,7 @@
                                         @for (int i = 0; i < 3; i++)
                                         {
                                             string trimestreActual = trimestres[i];
-                                            if (Session["rolUser"] != "Admin")
+                                            if (cliente.rol != "Admin")
                                             {
 
                                                 // Revisa si existen notas para ese alumno con esta materia
@@ -296,7 +297,7 @@
                                                 </td>
                                             }
                                         }
-                                        @if (Session["rolUser"] != "Admin")
+                                        @if (cliente.rol != "Admin")
                                         {
                                             <td>
 

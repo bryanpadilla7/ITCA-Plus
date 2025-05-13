@@ -4,8 +4,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var Listado = ViewBag.ListadoPorMateriaGrado as List<ITCA_Plus.Models.vw_AlumnosPorMateriaGrado>;
-   
-   
+    var cliente = Session["cuenta"] as ITCA_Plus.Models.Usuarios;
+
 }
 <script>
     $(document).ready(function () {
@@ -182,7 +182,7 @@
             <!-- Formulario para agregar notas por alumno-->
             @using (Html.BeginForm("CertificadoNotas", "mostarNotas", System.Web.Mvc.FormMethod.Post))
             {
-                if (Session["rolUser"] == "Admin")
+                if (cliente.rol == "Admin")
                 {
                     <div class="mb-3">
                         @Html.Label("Docente:")

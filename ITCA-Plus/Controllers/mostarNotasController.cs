@@ -10,13 +10,16 @@ namespace ITCA_Plus.Controllers
     public class mostarNotasController : Controller
     {
         ITCAPlusEntities contexto = new ITCAPlusEntities();
+        public Usuarios UsuarioActual => Session["cuenta"] as Usuarios;
+
+        public int UsuarioID => UsuarioActual?.id ?? 0;
         int userActualID = 2;
         int anioActual = DateTime.Now.Year;
         public void llenarcmb()
         {
             //cmbGrado este solo sirve si es el docentequien esta en la vis
             //debo mostrarle todos los grados al admin
-            if (Session["rolUser"] == "Admin")
+            if (UsuarioActual.rol.ToString() == "Admin")
             {
                 var listaDocentes = (from d in contexto.Docente
                                      join u in contexto.Usuarios on d.usuario_id equals u.id
@@ -109,9 +112,15 @@ namespace ITCA_Plus.Controllers
         // GET: mostarNotas
         public ActionResult CertificadoNotas()
         {
-            
-            llenarcmb();
-            return View();
+            if (UsuarioActual != null)
+            {
+                llenarcmb();
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
         }
         [HttpPost]
          public ActionResult CertificadoNotas(int grado, int materia, int alumno = 0)

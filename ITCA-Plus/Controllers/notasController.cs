@@ -8,20 +8,25 @@ using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using static System.Net.Mime.MediaTypeNames;
+using ITCA_Plus.Models;
 
 namespace ITCA_Plus.Controllers
 {
     public class notasController : Controller
     {
+        
         ITCAPlusEntities contexto = new ITCAPlusEntities();
-        int userActualID = 2;
+        //int userActualID = 2;
+        public Usuarios UsuarioActual => Session["cuenta"] as Usuarios;
+
+        public int UsuarioID => UsuarioActual?.id ?? 0;
         int anioActual = DateTime.Now.Year;
         DateTime fecha = DateTime.Now;
         public void llenarCmb()
         {
             
-                    
-                    if(Session["rolUser"] == "Admin"){
+
+            if (UsuarioActual.rol.ToString() == "Admin"){
                         var listaDocentes = (from d in contexto.Docente
                                              join u in contexto.Usuarios on d.usuario_id equals u.id
                                              select new SelectListItem
@@ -43,7 +48,7 @@ namespace ITCA_Plus.Controllers
             else
             {
                 //cmbGrado
-                ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID)
+                ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == UsuarioID)
                     .Select(x => new SelectListItem
                     {
                         Text = x.grado_nombre,
@@ -59,7 +64,7 @@ namespace ITCA_Plus.Controllers
         [HttpPost]
         public JsonResult ObtenerAlumnosPorGrado(int grado, int mat, int docente =0)
         {
-            if (Session["rolUser"] == "Admin")
+            if (UsuarioActual.rol.ToString() == "Admin")
             {
                 var alumnos = contexto.vw_AlumnosPorMateriaGrado.Where(x => x.docente_id == docente
                 && x.materia_id == mat && x.grado_id == grado && x.anio_escolar == anioActual).Select(x => new SelectListItem
@@ -72,7 +77,7 @@ namespace ITCA_Plus.Controllers
             }
             else
             {
-                var alumnos = contexto.vw_AlumnosPorMateriaGrado.Where(x => x.docente_id == userActualID
+                var alumnos = contexto.vw_AlumnosPorMateriaGrado.Where(x => x.docente_id == UsuarioID
                 && x.materia_id == mat && x.grado_id == grado && x.anio_escolar == anioActual).Select(x => new SelectListItem
                 {
                     Text = x.alumno,
@@ -86,7 +91,7 @@ namespace ITCA_Plus.Controllers
         [HttpPost]
         public JsonResult ObtenerMaterias(int grado, int docente=0)
         {
-            if (Session["rolUser"] == "Admin")
+            if (UsuarioActual.rol.ToString() == "Admin")
             {
                 var materias = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == docente
            && x.grado_id == grado && x.anio_escolar == anioActual)
@@ -100,7 +105,7 @@ namespace ITCA_Plus.Controllers
             }
             else
             {
-                var materias = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == userActualID
+                var materias = contexto.vw_MateriasAsignadasDocente.Where(x => x.docente_id == UsuarioID
            && x.grado_id == grado && x.anio_escolar == anioActual)
                .Select(x => new SelectListItem
                {
@@ -118,8 +123,15 @@ namespace ITCA_Plus.Controllers
         // GET: notas
         public ActionResult CuadroCalificaciones()
         {
-            llenarCmb();
-            return View();
+            if (UsuarioActual != null)
+            {
+                llenarCmb();
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
         }
         [HttpPost]
         public ActionResult CuadroCalificaciones(int grado, int materia, int alumno = 0)
@@ -173,7 +185,7 @@ namespace ITCA_Plus.Controllers
                     temp.nota3 = n.nota3;
                     contexto.SaveChanges();
                     //Aqui vamos a modificar al notiCambios para que me desahibilite el btn otra ves
-                    notiCambioNota edi = contexto.notiCambioNota.FirstOrDefault(x => x.alumno_id == n.alumno_id && x.materia_id == n.materia_id && x.trimestres == n.trimestres && x.docente_id == userActualID);
+                    notiCambioNota edi = contexto.notiCambioNota.FirstOrDefault(x => x.alumno_id == n.alumno_id && x.materia_id == n.materia_id && x.trimestres == n.trimestres && x.docente_id == UsuarioID);
                     edi.permiso = false;
                     edi.fechaCierre = fecha;
                     contexto.SaveChanges();
@@ -208,31 +220,39 @@ namespace ITCA_Plus.Controllers
 
         public ActionResult EditarNotas(int idMateria, string nombreMateria, int idDoc, int idAlum, string nombreAlum)
         {
-            var trimestresEnNotiCambio = contexto.notiCambioNota.Where(x => x.alumno_id == idAlum &&  x.materia_id == idMateria && x.docente_id == userActualID)
+            if (UsuarioActual != null)
+            {
+                var trimestresEnNotiCambio = contexto.notiCambioNota.Where(x => x.alumno_id == idAlum && x.materia_id == idMateria && x.docente_id == UsuarioID)
                                      .Select(x => x.trimestres)
                                      .ToList();
 
-            var lista = contexto.Notas
-                .Where(d => d.alumno_id == idAlum
-             && d.materia_id == idMateria
-             &&!trimestresEnNotiCambio.Contains(d.trimestres))
-                .Select(d => new SelectListItem
-                {
-                    Value = d.trimestres.ToString(),
-                    Text = d.trimestres
-                })
-                .Distinct()
-                .ToList();
-            ViewBag.idMateria = idMateria;
-            ViewBag.nombreMateria = nombreMateria;
-            ViewBag.idDoc = idDoc;
-            ViewBag.idAlum = idAlum;
-            ViewBag.nombreAlum = nombreAlum;
-            var nombreDoc= contexto.Usuarios.FirstOrDefault(d => d.id == idDoc);
-            ViewBag.nombreDoc = nombreDoc;
-            ViewBag.trimestres = lista;
+                var lista = contexto.Notas
+                    .Where(d => d.alumno_id == idAlum
+                 && d.materia_id == idMateria
+                 && !trimestresEnNotiCambio.Contains(d.trimestres))
+                    .Select(d => new SelectListItem
+                    {
+                        Value = d.trimestres.ToString(),
+                        Text = d.trimestres
+                    })
+                    .Distinct()
+                    .ToList();
+                ViewBag.idMateria = idMateria;
+                ViewBag.nombreMateria = nombreMateria;
+                ViewBag.idDoc = idDoc;
+                ViewBag.idAlum = idAlum;
+                ViewBag.nombreAlum = nombreAlum;
+                var nombreDoc = contexto.Usuarios.FirstOrDefault(d => d.id == idDoc);
+                ViewBag.nombreDoc = nombreDoc;
+                ViewBag.trimestres = lista;
+
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("login", "AccountController");
+            }
             
-            return View();  
         }
         [HttpPost]
         public ActionResult GuardarSolicitudNotas(notiCambioNota edi)
