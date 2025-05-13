@@ -67,9 +67,9 @@ namespace ITCA_Plus.Controllers
             return View();
         }
 
-        public ActionResult Confirmar(String token)
+        public ActionResult Confirmar(String correo)
         {
-            Usuarios user = db.Usuarios.FirstOrDefault(u => u.Token == token);
+            Usuarios user = db.Usuarios.FirstOrDefault(u => u.correo == correo);
             if (user == null)
             {
                 ViewBag.Respuesta = false;
@@ -77,6 +77,7 @@ namespace ITCA_Plus.Controllers
             }
 
             ViewBag.Respuesta = true;
+            ViewBag.Nombre = user.nombre;
             user.confirmar = true;
             db.SaveChanges();
             return View();

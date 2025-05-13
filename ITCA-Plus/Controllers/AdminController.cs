@@ -1,6 +1,8 @@
 ﻿using ITCA_Plus.Models;
+using ITCA_Plus.Servicios;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -13,11 +15,6 @@ namespace ITCA_Plus.Controllers
         ITCAPlusEntities db = new ITCAPlusEntities();
         // GET: Admin
         public ActionResult Index()
-        {
-            return View();
-        }
-
-        public ActionResult AgregarDocente()
         {
             return View();
         }
@@ -40,39 +37,155 @@ namespace ITCA_Plus.Controllers
 
         }
 
+        [HttpGet]
+        public ActionResult GetDoc(string usuario)
+        {
+            var user = db.Usuarios.FirstOrDefault(u => u.usuario == usuario && u.rol == "Docente");
 
+            if (usuario == null)
+                return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+
+            var docente = db.Docente.FirstOrDefault(d => d.usuario_id == user.id);
+
+            return Json(new
+            {
+                success = true,
+                usuario = new
+                {
+                    user.id,
+                    user.nombre,
+                    user.tel,
+                    user.correo,
+                    user.contrasena,
+                    fotografia = user.fotografia != null ? Convert.ToBase64String(user.fotografia) : null
+                },
+                especialidad = docente?.especialidad
+            }, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public ActionResult AgregarDocente()
+        {
+            return View();
+        }
+  
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult AgregarDocente(Usuarios usuario, string especialidad, HttpPostedFileBase foto)
         {
-            if (ModelState.IsValid)
+
+            // Valida si ya existe un usuario con ese correo
+            bool existeCorreo = db.Usuarios.Any(x => x.correo == usuario.correo);
+
+            if (existeCorreo)
             {
-                if (foto != null && foto.ContentLength > 0)
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        foto.InputStream.CopyTo(ms);
-                        usuario.fotografia = ms.ToArray();
-                    }
-                }
-
-                usuario.rol = "Docente";
-                db.Usuarios.Add(usuario);
-                db.SaveChanges();
-
-                Docente docente = new Docente
-                {
-                    usuario_id = usuario.id,
-                    especialidad = especialidad
-                };
-
-                db.Docente.Add(docente);
-                db.SaveChanges();
-
-                return RedirectToAction("Index"); 
+                return Json(new { success = false, message = "Este correo ya está registrado." });
             }
 
-            return View(usuario);
+            if (foto != null && foto.ContentLength > 0)
+            {
+                using (var binaryReader = new BinaryReader(foto.InputStream))
+                {
+                    usuario.fotografia = binaryReader.ReadBytes(foto.ContentLength);
+                }
+            }
+
+            // Obtener el año actual en formato corto (dos dígitos)
+            string anioCorto = DateTime.Now.Year.ToString().Substring(2); // "25"
+
+            // Obtener todos los tokens de usuarios con rol "Docente" que coincidan con el año actual
+            var tokensDocentesAnio = db.Usuarios
+                .Where(u => u.rol == "Docente" && u.usuario != null && u.usuario.EndsWith(anioCorto))
+                .Select(u => u.usuario)
+                .ToList();
+
+            // El siguiente número de secuencia es el total + 1
+            int numeroSecuencial = tokensDocentesAnio.Count + 1;
+            string numeroFormateado = numeroSecuencial.ToString("D2"); // Formato 2 dígitos, ej: 01, 02, etc.
+
+            // Obtener inicial del nombre
+            char inicial = usuario.nombre.Trim()[0];
+
+            // Generar el token (carnet)
+            string carnet = $"D{inicial}{numeroFormateado}{anioCorto}";
+
+            // Asignar token al usuario
+            usuario.usuario = carnet;
+
+
+            usuario.confirmar = false;
+            usuario.restablecer = false;
+            usuario.rol = "Docente";
+            db.Usuarios.Add(usuario);
+            db.SaveChanges();
+
+            Docente docente = new Docente
+            {
+                usuario_id = usuario.id,
+                especialidad = especialidad
+            };
+
+            db.Docente.Add(docente);
+            db.SaveChanges();
+
+            string path = HttpContext.Server.MapPath("~/plantilla/Confirmar.html");
+            string content = System.IO.File.ReadAllText(path);
+            string url = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Headers["host"], "/Account/Confirmar?correo=" + usuario.correo);
+
+            string htmlBody = string.Format(content, usuario.nombre, url);
+
+            CorreoDTO correoDTO = new CorreoDTO()
+            {
+                Para = usuario.correo,
+                Asunto = "Confirmar cuenta",
+                Contenido = htmlBody
+            };
+
+            bool enviado = CorreoServicio.Enviar(correoDTO);
+
+
+            return Json(new { success = true });
+
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ActualizarDocente(Usuarios usuario, string especialidad, HttpPostedFileBase foto)
+        {
+            var usuarioBD = db.Usuarios.FirstOrDefault(x => x.id == usuario.id);
+
+            if (usuarioBD == null)
+            {
+                return Json(new { success = false, message = "Docente no encontrado." });
+            }
+
+            // Actualizar datos
+            usuarioBD.nombre = usuario.nombre;
+            usuarioBD.tel = usuario.tel;
+            usuarioBD.correo = usuario.correo;
+
+            if (foto != null && foto.ContentLength > 0)
+            {
+                using (var binaryReader = new BinaryReader(foto.InputStream))
+                {
+                    usuarioBD.fotografia = binaryReader.ReadBytes(foto.ContentLength);
+                }
+            }
+
+            db.Entry(usuarioBD).State = EntityState.Modified;
+
+            // Actualizar especialidad en tabla Docente
+            var docenteBD = db.Docente.FirstOrDefault(d => d.usuario_id == usuario.id);
+            if (docenteBD != null)
+            {
+                docenteBD.especialidad = especialidad;
+                db.Entry(docenteBD).State = EntityState.Modified;
+            }
+
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Docente actualizado correctamente." });
         }
 
     }

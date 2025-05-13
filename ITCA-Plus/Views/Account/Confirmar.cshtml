@@ -12,7 +12,7 @@
         @if ((bool)ViewBag.Respuesta)
         {
             <div class="alert alert-success">
-                <p><b>Listo!</b>&nbsp; Su cuenta fue confirmada. Ahora puede acceder</p>
+                <p><b>Listo!</b>&nbsp; @ViewBag.Nombre, su cuenta fue confirmada. Ahora puede acceder</p>
                 <a class="btn btn-success" href="@Url.Action("Login", "Account")">Ingresar</a>
             </div>
         }

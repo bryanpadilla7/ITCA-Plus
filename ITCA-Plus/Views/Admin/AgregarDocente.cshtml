@@ -11,8 +11,12 @@
     @Scripts.Render("~/bundles/jqueryval")
 }
 
+<!-- Sección de Scripts -->
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
+
+        $('#actualizar').addClass('d-none');
+
         load();
 
         function load() {
@@ -24,47 +28,143 @@
                     $('#tbody').empty();
                     if (data.length > 0) {
                         data.forEach((user, index) => {
-                            $('#tbody').append(
-                                `<tr>
+                            $('#tbody').append(`
+                                <tr>
                                     <td>${index + 1}</td>
                                     <td>${user.nombre}</td>
                                     <td>${user.tel}</td>
-                                    <td>${user.usuario}</td>
                                     <td>${user.correo}</td>
-                                    <td>${user.Token}</td>
+                                    <td>${user.usuario}</td>
                                     <td>
-                                        <a href="#" class="me-2"
-                                           style="text-decoration:none;"
-                                           onclick="cargarUpdate('${user.Token}')"
-                                           data-bs-toggle="modal"
-                                           data-bs-target="#modalDocente"
-                                           data-toggle="tooltip"
-                                           data-placement="top"
-                                           title="Editar">
+                                        <a href="#" class="me-2" onclick="cargarUpdate('${user.usuario}')" data-bs-toggle="modal" data-bs-target="#modalDocente" title="Editar">
                                             <i class="fa-solid fa-pen fa-lg text-warning"></i>
                                         </a>
-                                        <a href="#"
-                                           style="text-decoration:none;"
-                                           onclick="cargarDelete('${user.Token}')"
-                                           data-bs-toggle="modal"
-                                           data-bs-target="#modalDocente"
-                                           data-toggle="tooltip"
-                                           data-placement="top"
-                                           title="Eliminar">
+                                        <a href="#" onclick="cargarDelete('${user.usuario}')" data-bs-toggle="modal" data-bs-target="#modalDocente" title="Eliminar">
                                             <i class="fa-solid fa-trash fa-lg text-danger"></i>
                                         </a>
                                     </td>
-                                </tr>`
-                            );
+                                </tr>`);
                         });
-
                     } else {
-                        $('#tbody').append('<tr><td colspan="5" class="text-center">No hay docentes.</td></tr>');
+                        $('#tbody').append('<tr><td colspan="6" class="text-center">No hay docentes.</td></tr>');
                     }
                 },
                 error: function () {
                     alert('Error al cargar los docentes.');
                 }
+            });
+        }
+
+        $(document).on('submit', '#formDocente', function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            var isUpdate = $('#actualizar').is(':visible');
+
+            $.ajax({
+                url: isUpdate ? '@Url.Action("ActualizarDocente", "Admin")' : '@Url.Action("AgregarDocente", "Admin")',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire(isUpdate ? 'Docente actualizado' : 'Docente registrado', '', 'success').then(() => {
+                            $('#idDocente').val('');
+                            $('#btnCerrarModal').click();
+                            load();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                }
+            });
+            });
+        });
+
+    function cargarUpdate(usuario) {
+        $.ajax({
+            url: '@Url.Action("GetDoc", "Admin")',
+            type: 'GET',
+            data: { usuario: usuario },
+            success: function (data) {
+                if (data.success) {
+                    $('#Id').val(data.usuario.id);
+                    $('#formDocente input[name="nombre"]').val(data.usuario.nombre);
+                    $('#formDocente input[name="tel"]').val(data.usuario.tel);
+                    $('#formDocente input[name="correo"]').val(data.usuario.correo);
+                    $('#formDocente input[name="contrasena"]').val(data.usuario.contrasena);
+                    $('#formDocente select[name="especialidad"]').val(data.especialidad);
+
+                    if (data.usuario.fotografia) {
+                        let base64Image = "data:image/png;base64," + data.usuario.fotografia;
+                        $('#previewFoto').attr('src', base64Image).removeClass('d-none');
+                    } else {
+                        $('#previewFoto').attr('src', '#').addClass('d-none');
+                    }
+
+                    $('#guardar').addClass('d-none');
+                    $('#actualizar').removeClass('d-none');
+                } else {
+                    alert('No se pudieron cargar los datos del docente.');
+                }
+            },
+            error: function () {
+                alert('Error al cargar los datos.');
+            }
+        });
+    }
+
+    function mostrarPreview(event) {
+        const input = event.target;
+        const preview = document.getElementById("previewFoto");
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove("d-none");
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalElement = document.getElementById("modalDocente");
+
+        if (modalElement) {
+            modalElement.addEventListener("hidden.bs.modal", function () {
+                const form = document.getElementById("formDocente");
+                if (form) form.reset();
+
+                const fotoPreview = document.getElementById("previewFoto");
+                if (fotoPreview) {
+                    fotoPreview.src = "#";
+                    fotoPreview.classList.add("d-none");
+                }
+
+                form.querySelectorAll('.is-invalid, .is-valid').forEach(input => {
+                    input.classList.remove('is-invalid', 'is-valid');
+                });
+
+                form.querySelectorAll('.field-validation-error, .text-danger').forEach(span => {
+                    span.innerHTML = '';
+                });
+
+                form.classList.remove('was-validated');
+
+                $('#guardar').removeClass('d-none');
+                $('#actualizar').addClass('d-none');
+            });
+        }
+
+        const telInput = document.getElementById('tel');
+        if (telInput) {
+            telInput.addEventListener('input', function () {
+                let value = telInput.value.replace(/\D/g, '');
+                if (value.length > 4) {
+                    value = value.slice(0, 4) + '-' + value.slice(4, 8);
+                }
+                telInput.value = value.slice(0, 9);
             });
         }
     });
@@ -83,7 +183,7 @@
                     <button type="button" class="btn btn-danger">
                         <i class="fa-solid fa-circle-minus"></i> Borrar
                     </button>
-                    <button type="button" onclick="cargarNuevo()" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDocente" id="btnNuevo">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDocente" id="btnNuevo">
                         <i class="fa-solid fa-circle-plus"></i> Agregar docente
                     </button>
                 </div>
@@ -96,7 +196,6 @@
                             <th>#</th>
                             <th>Nombre</th>
                             <th>Tel</th>
-                            <th>Usuario</th>
                             <th>Correo</th>
                             <th>Carnet</th>
                             <th>Acciones</th>
@@ -116,16 +215,17 @@
         <div class="modal-content rounded-4 shadow border-0">
             <div class="modal-header bg-success text-white rounded-top-4">
                 <h5 class="modal-title" id="modalDocenteLabel">Agregar Docente</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar" id="btnCerrarModal"></button>
             </div>
             <div class="modal-body">
-                @using (Html.BeginForm("AgregarDocente", "Docente", FormMethod.Post, new { id = "formDocente", enctype = "multipart/form-data" }))
-                {
+                <form id="formDocente" enctype="multipart/form-data">
+                    
                     @Html.AntiForgeryToken()
 
                     <div class="row g-4">
                         <!-- Columna izquierda -->
                         <div class="col-md-7">
+                            <input type="hidden" name="Id" id="Id" />
                             <div class="mb-3">
                                 @Html.LabelFor(m => m.nombre, new { @class = "form-label" })
                                 <div class="input-group">
@@ -166,7 +266,7 @@
                                 @Html.Label("Especialidad", new { @class = "form-label" })
                                 @Html.DropDownList("especialidad", new SelectList(new[]
                                 {
-                                    "Matemáticas", "Lenguaje", "Ciencias", "Estudios Sociales", "Educación Física", "Computación", "Arte"
+                                    "Matemáticas","Sociales", "Lenguaje", "Ciencias", "Estudios Sociales", "Educación Física", "Computación", "Arte"
                                 }), "Seleccione una especialidad", new { @class = "form-select", required = "required", style = "max-width: none" })
                                 <div class="invalid-feedback">Seleccione una especialidad válida.</div>
                             </div>
@@ -185,67 +285,19 @@
                     </div>
 
                     <div class="d-grid mt-3">
-                        <button type="submit" class="btn btn-success rounded-pill">
+                        <button type="submit" class="btn btn-success rounded-pill" id="guardar">
                             <i class="bi bi-plus-circle me-2"></i> Registrar Docente
                         </button>
+
+                        <button type="submit" class="btn btn-success rounded-pill" id="actualizar">
+                            <i class="bi bi-plus-circle me-2"></i> Actualizar Docente
+                        </button>
                     </div>
-                }
+                </form>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-    const modalElement = document.getElementById("modalDocente");
-
-    if (modalElement) {
-        modalElement.addEventListener("hidden.bs.modal", function () {
-            const form = document.getElementById("formDocente");
-            if (form) form.reset();
-
-            const fotoPreview = document.getElementById("previewFoto");
-            if (fotoPreview) {
-                fotoPreview.src = "#";
-                fotoPreview.classList.add("d-none");
-            }
-
-            // Limpia validaciones visuales
-            const inputs = document.querySelectorAll('#formDocente .is-invalid, #formDocente .is-valid');
-            inputs.forEach(input => {
-                input.classList.remove('is-invalid', 'is-valid');
-            });
-
-            // Quitar mensajes de validación
-            const validationSpans = form.querySelectorAll('.field-validation-error, .text-danger');
-            validationSpans.forEach(span => span.innerHTML = '');
-
-            form.classList.remove('was-validated');
-            });
-        }
-    });
-</script>
-
-
-
-
-<script>
-    function mostrarPreview(event) {
-        const input = event.target;
-        const preview = document.getElementById("previewFoto");
-
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                preview.src = e.target.result;
-                preview.classList.remove("d-none");
-            };
-
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-</script>
 
 
 <script>
@@ -262,26 +314,6 @@
             }, false)
         })
     })()
-
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const telInput = document.getElementById('tel');
-
-        // Máscara en tiempo real
-        telInput.addEventListener('input', function () {
-            let value = telInput.value.replace(/\D/g, ''); // solo dígitos
-            if (value.length > 4) {
-                value = value.slice(0, 4) + '-' + value.slice(4, 8);
-            }
-            telInput.value = value.slice(0, 9); // máx. 9 caracteres con guion
-        });
-
-        // Al enviar el formulario, se remueve el guion
-        const form = telInput.closest('form');
-        form.addEventListener('submit', function () {
-            telInput.value = telInput.value.replace(/-/g, '');
-        });
-    });
 </script>
 
 
