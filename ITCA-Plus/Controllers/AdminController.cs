@@ -37,6 +37,11 @@ namespace ITCA_Plus.Controllers
 
         }
 
+        public ActionResult AgregarDocente()
+        {
+            return View();
+        }
+
         [HttpGet]
         public ActionResult GetDoc(string usuario)
         {
@@ -64,11 +69,7 @@ namespace ITCA_Plus.Controllers
 
         }
 
-        public ActionResult AgregarDocente()
-        {
-            return View();
-        }
-  
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult AgregarDocente(Usuarios usuario, string especialidad, HttpPostedFileBase foto)
@@ -82,8 +83,17 @@ namespace ITCA_Plus.Controllers
                 return Json(new { success = false, message = "Este correo ya está registrado." });
             }
 
+            // Validar si el archivo es una imagen válida (png, jpg, jpeg, gif)
             if (foto != null && foto.ContentLength > 0)
             {
+                // Lista de tipos MIME válidos para imágenes
+                var tiposValidos = new[] { "image/png", "image/jpeg", "image/jpg", "image/gif" };
+
+                if (!tiposValidos.Contains(foto.ContentType.ToLower()))
+                {
+                    return Json(new { success = false, message = "El archivo debe ser una imagen (png, jpg, jpeg, gif)." });
+                }
+
                 using (var binaryReader = new BinaryReader(foto.InputStream))
                 {
                     usuario.fotografia = binaryReader.ReadBytes(foto.ContentLength);
@@ -165,11 +175,20 @@ namespace ITCA_Plus.Controllers
             usuarioBD.tel = usuario.tel;
             usuarioBD.correo = usuario.correo;
 
+            // Validar si el archivo es una imagen válida (png, jpg, jpeg, gif)
             if (foto != null && foto.ContentLength > 0)
             {
+                // Lista de tipos MIME válidos para imágenes
+                var tiposValidos = new[] { "image/png", "image/jpeg", "image/jpg", "image/gif" };
+
+                if (!tiposValidos.Contains(foto.ContentType.ToLower()))
+                {
+                    return Json(new { success = false, message = "El archivo debe ser una imagen (png, jpg, jpeg, gif)." });
+                }
+
                 using (var binaryReader = new BinaryReader(foto.InputStream))
                 {
-                    usuarioBD.fotografia = binaryReader.ReadBytes(foto.ContentLength);
+                    usuario.fotografia = binaryReader.ReadBytes(foto.ContentLength);
                 }
             }
 
@@ -187,6 +206,64 @@ namespace ITCA_Plus.Controllers
 
             return Json(new { success = true, message = "Docente actualizado correctamente." });
         }
+
+
+        public ActionResult Materia()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult listaMaterias()
+        {
+            var materias = db.Materia.Select(x => new
+            {
+                x.id,
+                x.nombre
+            }).ToList();
+
+            return Json(new { success = true, materias }, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public ActionResult Crear(Materia materia)
+        {
+            if (string.IsNullOrWhiteSpace(materia.nombre))
+                return Json(new { success = false, message = "El nombre es obligatorio." });
+
+            db.Materia.Add(materia);
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Materia registrada correctamente." });
+        }
+
+        [HttpPost]
+        public ActionResult Actualizar(Materia materia)
+        {
+            var materiaBD = db.Materia.Find(materia.id);
+            if (materiaBD == null)
+                return Json(new { success = false, message = "Materia no encontrada." });
+
+            materiaBD.nombre = materia.nombre;
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Materia actualizada correctamente." });
+        }
+
+        [HttpPost]
+        public JsonResult Eliminar(int id)
+        {
+            var materia = db.Materia.Find(id);
+            if (materia == null)
+                return Json(new { success = false, message = "Materia no encontrada." });
+
+            db.Materia.Remove(materia);
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Materia eliminada correctamente." });
+        }
+
 
     }
 }

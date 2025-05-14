@@ -1,0 +1,163 @@
+﻿
+@{
+    ViewBag.Title = "Materia";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model ITCA_Plus.Models.Materia
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+}
+<script>
+    //FALTA ELIMINAR Y CANCELAR
+
+    // Función para cancelar edición
+    function cancelarEdicion() {
+        $('#materiaId').val('');
+        $('#materiaNombre').val('');
+        $('#formMateria').removeClass('was-validated');
+    }
+
+    // Editar materia (cargar datos al form)
+    function editarMateria(id, nombre) {
+        $('#id').val(id);
+        $('#nombre').val(nombre);
+        $('#Actualizar').show();
+        $('#Agregar').hide();
+    }
+
+
+    // Eliminar materia
+    function eliminarMateria(id) {
+        Swal.fire({
+            title: '¿Seguro que quieres eliminar?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('@Url.Action("Eliminar", "Materia")', { id: id }, function (response) {
+                    if (response.success) {
+                        Swal.fire('Eliminado', response.message, 'success');
+                       
+                        loadMaterias();
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                });
+            }
+        });
+    }
+
+
+    $(document).ready(function () {
+
+
+        $('#Actualizar').hide();
+        loadMaterias();
+
+
+        function loadMaterias() {
+            $.ajax({
+                url: '@Url.Action("listaMaterias", "Admin")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success && data.materias.length > 0) {
+                        var html = '';
+                        data.materias.forEach(materia => {
+                            html += '<tr>';
+                            html += '<td>' + materia.id + '</td>';
+                            html += '<td>' + materia.nombre + '</td>';
+                            html += '<td><button class="btn btn-primary btn-sm" onclick="editarMateria(' + materia.id + ', \'' + materia.nombre + '\')">Editar</button></td>';
+                            html += '<td><button class="btn btn-danger btn-sm" onclick="eliminarMateria(' + materia.id + ')">Eliminar</button></td>';
+                            html += '</tr>';
+                        });
+                        $('#tablaMaterias').html(html);
+                    } else {
+                        $('#tablaMaterias').html('<tr><td colspan="4" class="text-center">No hay materias registradas</td></tr>');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'No se pudo cargar la lista de materias.', 'error');
+                }
+            });
+        }
+
+
+         // Guardar (Agregar / Editar)
+        $('#formCrear').on('submit', function (e) {
+            console.log("hasta aqui");
+            e.preventDefault();
+            var form = this;
+
+            form.classList.add('was-validated');
+
+            if (form.checkValidity() === false) {
+                return;
+            }
+
+
+            var isUpdate = $('#Actualizar').is(':visible');
+
+            var formData = $(form).serialize();
+            //var id = $('#id').val();
+
+            var url = isUpdate ? '@Url.Action("Actualizar", "Admin")' : '@Url.Action("Crear", "Admin")';
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire('Éxito', response.message, 'success');
+                        form.reset();
+                        form.classList.remove('was-validated');
+                        $('#Actualizar').hide();
+                        $('#Agregar').show();
+                        loadMaterias();
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                }
+            });
+        });
+    });
+
+
+</script>
+
+<h2>Gestión de Materias</h2>
+<main class="container py-5">
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6">
+            <form id="formCrear" class="needs-validation" novalidate>           
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.nombre, new { @class = "form-control", placeholder = "Nombre de la Materia", required = "required" })
+                    <button class="btn btn-primary" type="submit" id="Agregar">Agregar</button>
+                    <button class="btn btn-warning" type="submit" id="Actualizar">Actualizar</button>
+                </div>
+                @Html.ValidationMessageFor(m => m.nombre, "", new { @class = "text-danger small" })
+                @Html.HiddenFor(m => m.id)
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive mt-3">
+        <table class="table">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tablaMaterias" class="table-group-divider">
+            </tbody>
+        </table>
+    </div>
+</main>
