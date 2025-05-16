@@ -255,18 +255,26 @@ namespace ITCA_Plus.Controllers
             
         }
         [HttpPost]
+        [ValidateInput(false)]
         public ActionResult GuardarSolicitudNotas(notiCambioNota edi)
         {
-                contexto.notiCambioNota.Add(edi);
-                contexto.SaveChanges();
+            edi.nombre_docente = HttpUtility.HtmlDecode(edi.nombre_docente);
+            edi.nombre_alumno = HttpUtility.HtmlDecode(edi.nombre_alumno);
+            edi.nombre_materia = HttpUtility.HtmlDecode(edi.nombre_materia);
+
+            contexto.notiCambioNota.Add(edi);
+            contexto.SaveChanges();
             TempData["msj"] = "Se guardo";
             HelperNotify.Notificar(this, "Se ha guardado la solicitud de edición", "info");
             return RedirectToAction("CuadroCalificaciones");
-             
+
         }
-        
-        
+
+
     }
+
+
+}
 
 
 }
