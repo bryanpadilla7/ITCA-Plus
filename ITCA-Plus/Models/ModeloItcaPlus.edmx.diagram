@@ -24,7 +24,6 @@
         <EntityTypeShape EntityType="ITCAPlusModel.vw_MateriasAsignadasDocente" Width="1.5" PointX="7.75" PointY="11.25" />
         <EntityTypeShape EntityType="ITCAPlusModel.vw_NotasAnualesPorAlumno" Width="1.5" PointX="9.75" PointY="11.25" />
         <EntityTypeShape EntityType="ITCAPlusModel.vw_NotasPorAlumno" Width="1.5" PointX="10.75" PointY="2.25" />
-        <EntityTypeShape EntityType="ITCAPlusModel.vw_PerfilDocente" Width="1.5" PointX="10.75" PointY="7.25" />
         <AssociationConnector Association="ITCAPlusModel.FK__AlumnoRes__alumn__4AB81AF0" />
         <AssociationConnector Association="ITCAPlusModel.FK__Asistenci__alumn__5AEE82B9" />
         <AssociationConnector Association="ITCAPlusModel.FK__GradoAlum__anio___4E88ABD4" />
@@ -40,6 +39,7 @@
         <AssociationConnector Association="ITCAPlusModel.FK__DocenteMa__mater__534D60F1" />
         <AssociationConnector Association="ITCAPlusModel.FK__GradoAlum__grado__4F7CD00D" />
         <AssociationConnector Association="ITCAPlusModel.FK__Notas__materia_i__6754599E" />
+        <EntityTypeShape EntityType="ITCAPlusModel.vw_PerfilDocente" Width="1.5" PointX="11.375" PointY="6.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

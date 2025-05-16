@@ -11,7 +11,6 @@ namespace ITCA_Plus.Models
 {
     using System;
     using System.Collections.Generic;
-    
     using System.ComponentModel.DataAnnotations;
     public partial class Usuarios
     {
@@ -22,21 +21,21 @@ namespace ITCA_Plus.Models
         }
     
         public int id { get; set; }
-        [Required(ErrorMessage = "El nombre es obligatorio")]  
+        [Required(ErrorMessage = "nombre requerido")]
         public string nombre { get; set; }
-        [Required(ErrorMessage = "El telefono es obligatorio")]
+        [Required(ErrorMessage = "telefono requerido")]
         public string tel { get; set; }
-        [Required(ErrorMessage = "El usuario es obligatorio")]
         public string usuario { get; set; }
-        [Required(ErrorMessage = "El correo es obligatorio")]
+        [Required(ErrorMessage = "correo requerido")]
         public string correo { get; set; }
-        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [Required(ErrorMessage = "contrasña requerido")]
         public string contrasena { get; set; }
         public Nullable<bool> restablecer { get; set; }
         public Nullable<bool> confirmar { get; set; }
         public string Token { get; set; }
         public byte[] fotografia { get; set; }
         public string rol { get; set; }
+        public bool estado { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Docente> Docente { get; set; }

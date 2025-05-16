@@ -15,10 +15,30 @@
 
     // Función para cancelar edición
     function cancelarEdicion() {
-        $('#materiaId').val('');
-        $('#materiaNombre').val('');
-        $('#formMateria').removeClass('was-validated');
+    // Limpiar campos
+    $('#id').val('');
+    $('#nombre').val('');
+    $('#formCrear').removeClass('was-validated');
+    $('#formCrear')[0].reset();
+
+    // Mostrar/Ocultar botones
+    $('#Actualizar').hide();
+    $('#Agregar').show();
+    $('#cancelar').hide();
+
+    // Limpiar validaciones de Html.ValidationMessageFor
+    var spanError = document.querySelector('[data-valmsg-for="nombre"]');
+
+    if (spanError) {
+        // Limpiar el texto del mensaje
+        spanError.innerHTML = '';
+
+        // Cambiar la clase a "field-validation-valid"
+        spanError.classList.remove('field-validation-error');
+        spanError.classList.add('field-validation-valid');
     }
+}
+
 
     // Editar materia (cargar datos al form)
     function editarMateria(id, nombre) {
@@ -26,8 +46,46 @@
         $('#nombre').val(nombre);
         $('#Actualizar').show();
         $('#Agregar').hide();
+        $('#cancelar').show();
+
+        // Limpiar validaciones de Html.ValidationMessageFor
+        var spanError = document.querySelector('[data-valmsg-for="nombre"]');
+
+        if (spanError) {
+            // Limpiar el texto del mensaje
+            spanError.innerHTML = '';
+
+            // Cambiar la clase a "field-validation-valid"
+            spanError.classList.remove('field-validation-error');
+            spanError.classList.add('field-validation-valid');
+        }
     }
 
+    function loadMaterias() {
+    $.ajax({
+        url: '@Url.Action("listaMaterias", "Admin")',
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            if (data.success && data.materias.length > 0) {
+                var html = '';
+                data.materias.forEach(materia => {
+                    html += '<tr>';
+                    html += '<td>' + materia.id + '</td>';
+                    html += '<td>' + materia.nombre + '</td>';
+                    html += '<td><button class="btn btn-sm me-2" onclick="editarMateria(' + materia.id + ', \'' + materia.nombre + '\')"><i class="fa-solid fa-pen fa-lg text-warning"></i></button><button class="btn btn-sm" onclick="eliminarMateria(' + materia.id + ')"> <i class="fa-solid fa-trash fa-lg text-danger"></i></button></td>';
+                    html += '</tr>';
+                });
+                $('#tablaMaterias').html(html);
+            } else {
+                $('#tablaMaterias').html('<tr><td colspan="4" class="text-center">No hay materias registradas</td></tr>');
+            }
+        },
+        error: function () {
+            Swal.fire('Error', 'No se pudo cargar la lista de materias.', 'error');
+        }
+    });
+}
 
     // Eliminar materia
     function eliminarMateria(id) {
@@ -39,10 +97,9 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.post('@Url.Action("Eliminar", "Materia")', { id: id }, function (response) {
+                $.post('@Url.Action("Eliminar", "Admin")', { id: id }, function (response) {
                     if (response.success) {
                         Swal.fire('Eliminado', response.message, 'success');
-                       
                         loadMaterias();
                     } else {
                         Swal.fire('Error', response.message, 'error');
@@ -52,45 +109,22 @@
         });
     }
 
-
     $(document).ready(function () {
 
 
         $('#Actualizar').hide();
+        $('#cancelar').hide();
         loadMaterias();
 
+        document.getElementById('cancelar').addEventListener('click', function () {
+            cancelarEdicion();
+        });
 
-        function loadMaterias() {
-            $.ajax({
-                url: '@Url.Action("listaMaterias", "Admin")',
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    if (data.success && data.materias.length > 0) {
-                        var html = '';
-                        data.materias.forEach(materia => {
-                            html += '<tr>';
-                            html += '<td>' + materia.id + '</td>';
-                            html += '<td>' + materia.nombre + '</td>';
-                            html += '<td><button class="btn btn-primary btn-sm" onclick="editarMateria(' + materia.id + ', \'' + materia.nombre + '\')">Editar</button></td>';
-                            html += '<td><button class="btn btn-danger btn-sm" onclick="eliminarMateria(' + materia.id + ')">Eliminar</button></td>';
-                            html += '</tr>';
-                        });
-                        $('#tablaMaterias').html(html);
-                    } else {
-                        $('#tablaMaterias').html('<tr><td colspan="4" class="text-center">No hay materias registradas</td></tr>');
-                    }
-                },
-                error: function () {
-                    Swal.fire('Error', 'No se pudo cargar la lista de materias.', 'error');
-                }
-            });
-        }
+
 
 
          // Guardar (Agregar / Editar)
         $('#formCrear').on('submit', function (e) {
-            console.log("hasta aqui");
             e.preventDefault();
             var form = this;
 
@@ -126,6 +160,7 @@
                 }
             });
         });
+
     });
 
 
@@ -138,8 +173,9 @@
             <form id="formCrear" class="needs-validation" novalidate>           
                 <div class="input-group">
                     @Html.TextBoxFor(m => m.nombre, new { @class = "form-control", placeholder = "Nombre de la Materia", required = "required" })
-                    <button class="btn btn-primary" type="submit" id="Agregar">Agregar</button>
+                    <button class="btn btn-success" type="submit" id="Agregar">Agregar</button>
                     <button class="btn btn-warning" type="submit" id="Actualizar">Actualizar</button>
+                    <button class="btn btn-primary" type="button" id="cancelar">Cancelar</button>
                 </div>
                 @Html.ValidationMessageFor(m => m.nombre, "", new { @class = "text-danger small" })
                 @Html.HiddenFor(m => m.id)

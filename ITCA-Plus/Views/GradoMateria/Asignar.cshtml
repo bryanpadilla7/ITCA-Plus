@@ -1,0 +1,389 @@
+﻿
+@{
+    ViewBag.Title = "Asignar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script>
+    $(document).ready(function () {
+        const gradoId = getParameterByName('id'); // si llega como query param
+        cargarMateriasAsignadas(gradoId);
+        cargarDatos(gradoId)
+
+        function cargarDatos(gradoId) {
+             $.ajax({
+                 url: '@Url.Action("ObtenerDatosGrado", "GradoMateria")',
+                 type: 'GET',
+                 data: { id: gradoId },
+                 success: function (res) {
+                     if (res.success) {
+                         $('#gradoNombre').text(res.grado.nombre);
+                         $('#gradoSeccion').text(res.grado.seccion);
+                         $('#cantMaterias').text(res.cantidadMaterias);
+                         $('#cantAlumnos').text(res.cantidadAlumnos);
+
+                         // Llenar select de materias
+                         $('#materiaSelect').empty().append('<option value="">Seleccione una Materia</option>');
+                         res.materias.forEach(m => {
+                             $('#materiaSelect').append(`<option value="${m.id}">${m.nombre}</option>`);
+                         });
+                     } else {
+                         alert(res.message);
+                     }
+                 },
+                 error: function () {
+                     alert('Error al cargar los datos del grado');
+                 }
+             });
+        }
+
+        $('#materiaSelect').on('change', function () {
+            const materiaId = $(this).val();
+
+            if (materiaId) {
+                $.ajax({
+                    url: '/GradoMateria/GetDocentesPorEspecialidad',
+                    type: 'GET',
+                    data: { materiaId: materiaId },
+                    success: function (res) {
+                        if (res.length > 0) {
+                            $('#docenteSelect').empty().append('<option value="">Seleccione un Docente</option>');
+                            res.forEach(d => {
+                                $('#docenteSelect').append(`<option value="${d.docente_id}">${d.nombre_docente}</option>`);
+                            });
+                            $('#docenteContainer').show();
+                        } else {
+                            $('#docenteContainer').hide();
+                        }
+                    },
+                    error: function () {
+                        alert('Error al cargar docentes.');
+                        $('#docenteContainer').hide();
+                    }
+                });
+            } else {
+                $('#docenteContainer').hide();
+                $('#docenteSelect').empty();
+            }
+        });
+
+        function cargarMateriasAsignadas(gradoId) {
+            $.ajax({
+                url: '/GradoMateria/GetMateriasAsignadas',
+                type: 'GET',
+                data: { gradoId: gradoId },
+                success: function (res) {
+                    const tbody = $('#tablaMaterias');
+                    tbody.empty();
+
+                    if (res.length > 0) {
+                        res.forEach((m, index) => {
+                            tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${m.materia_nombre}</td>
+                            <td>${m.docente_nombre}</td>
+                            <td>${m.carnet}</td>
+                            <td>Acciones</td>
+                        </tr>
+                    `);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="5" class="text-center">No hay materias asignadas.</td></tr>');
+                    }
+                },
+                error: function () {
+                    alert('Error al cargar materias asignadas.');
+                }
+            });
+        }
+
+        $('#selectMateria').on('change', function () {
+            const materiaId = $(this).val();
+
+            if (materiaId) {
+                $.ajax({
+                    url: '/Docente/GetByEspecialidad',
+                    type: 'GET',
+                    data: { especialidadId: materiaId },
+                    success: function (data) {
+                        $('#selectDocente').empty().append('<option value="">Seleccione un docente</option>');
+                        data.forEach(doc => {
+                            $('#selectDocente').append(`<option value="${doc.id}">${doc.nombre}</option>`);
+                        });
+                        $('#selectDocente').removeClass('d-none');
+                    }
+                });
+            } else {
+                $('#selectDocente').addClass('d-none').empty().append('<option value="">Seleccione un docente</option>');
+            }
+        });
+
+        $('#btnAsignarMateria').on('click', function () {
+            const materiaId = $('#materiaSelect').val();
+            const docenteId = $('#docenteSelect').val();
+
+            if (!materiaId || !docenteId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campos obligatorios',
+                    text: 'Debe seleccionar una materia y un docente.'
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '/GradoMateria/AsignarMateria',
+                type: 'POST',
+                data: {
+                    gradoId: gradoId,
+                    materiaId: materiaId,
+                    docenteId: docenteId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Asignado!',
+                            text: response.message
+                        }).then(() => {
+                            // Recargar tabla de materias
+                            cargarDatos(gradoId);
+                            cargarMateriasAsignadas(gradoId);
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de servidor',
+                        text: 'No se pudo completar la solicitud.'
+                    });
+                }
+            });
+        });
+
+        cargarAlumnosDisponibles(gradoId);
+
+        function cargarAlumnosDisponibles() {
+            $.ajax({
+                url: '/GradoMateria/GetAlumnosDisponibles',
+                type: 'GET',
+                data: { gradoId: gradoId },
+                success: function (data) {
+                    $('#selectAlumno').empty().append('<option value="">Seleccione un alumno</option>');
+                    data.forEach(alumno => {
+                        $('#selectAlumno').append(`<option value="${alumno.id}">${alumno.nombre}</option>`);
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudieron cargar los alumnos.'
+                    });
+                }
+            });
+        }
+
+        cargarAlumnosAsignados(gradoId);
+
+        function cargarAlumnosAsignados(gradoId) {
+            $.ajax({
+                url: '/GradoMateria/GetAlumnosAsignados',
+                type: 'GET',
+                data: { gradoId: gradoId },
+                success: function (data) {
+                    $('#tablaAlumnos').empty();
+
+                    if (data.length === 0) {
+                        $('#tablaAlumnos').append(`
+                            <tr>
+                                <td colspan="4" class="text-center">No hay alumnos asignados.</td>
+                            </tr>
+                        `);
+                        return;
+                    }
+
+                    data.forEach((alumno, index) => {
+                        $('#tablaAlumnos').append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${alumno.nombre}</td>
+                                <td>${alumno.carnet}</td>
+                                <td>acciones</td>
+                            </tr>
+                        `);
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudieron cargar los alumnos asignados.'
+                    });
+                }
+            });
+        }
+
+
+        $('#btnAsignarAlumno').on('click', function () {
+            const alumnoId = $('#selectAlumno').val();
+
+            if (!alumnoId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campo obligatorio',
+                    text: 'Debe seleccionar un alumno.'
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '/GradoMateria/AsignarAlumno',
+                type: 'POST',
+                data: {
+                    gradoId: gradoId,
+                    alumnoId: alumnoId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Asignado!',
+                            text: response.message
+                        }).then(() => {
+                            cargarAlumnosAsignados(gradoId);
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de servidor',
+                        text: 'No se pudo completar la solicitud.'
+                    });
+                }
+            });
+        });
+
+        //fin de ajax
+    });
+
+
+
+
+    // Utilidad para obtener parámetros de la URL
+    function getParameterByName(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+    }
+</script>
+<h2>Asignar</h2>
+
+<div class="container mt-4">
+    <!-- Datos del Grado -->
+    <div class="card mb-4">
+        <div class="card-body d-flex justify-content-between">
+            <div>
+                <h5 class="card-title">Datos del Grado</h5>
+                <p class="mb-0">Nombre: <strong id="gradoNombre"></strong></p>
+                <p class="mb-0">Sección: <strong id="gradoSeccion"></strong></p>
+            </div>
+            <div class="text-end">
+                <p class="mb-0">Cant. de Alumnos: <strong id="cantAlumnos"></strong></p>
+                <p class="mb-0">Cant. de Materias: <strong id="cantMaterias"></strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs: Materias | Alumnos -->
+    <ul class="nav nav-tabs mb-3" id="gradoTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="materias-tab" data-bs-toggle="tab" data-bs-target="#materias" type="button" role="tab">Materias</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="alumnos-tab" data-bs-toggle="tab" data-bs-target="#alumnos" type="button" role="tab">Alumnos</button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Tab Materias -->
+        <div class="tab-pane fade show active" id="materias" role="tabpanel">
+            <div class="mb-3">
+                <label for="materiaSelect" class="form-label">Materia</label>
+                <select id="materiaSelect" class="form-select">
+                    <option value="">Seleccione una Materia</option>
+                    <!-- Opciones dinámicas -->
+                </select>
+            </div>
+
+            <div class="mb-3" id="docenteContainer" style="display: none;">
+                <label for="docenteSelect" class="form-label">Docente</label>
+                <select id="docenteSelect" class="form-select">
+                    <option value="">Seleccione un Docente</option>
+                    <!-- Opciones dinámicas -->
+                </select>
+            </div>
+
+
+            <button class="btn btn-primary mb-3" id="btnAsignarMateria">Asignar Materia</button>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Materia</th>
+                        <th>Docente</th>
+                        <th>Carnet Docente</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaMaterias">
+                    <!-- Filas de materias asignadas -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab Alumnos -->
+        <div class="tab-pane fade" id="alumnos" role="tabpanel">
+            <div class="mb-3">
+                <label for="selectAlumno" class="form-label">Seleccionar Alumno</label>
+                <select id="selectAlumno" class="form-select">
+                    <option value="">Seleccione un alumno</option>
+                    <!-- Opciones se cargan por AJAX -->
+                </select>
+            </div>
+
+            <button id="btnAsignarAlumno" class="btn btn-primary">Asignar Alumno</button>
+
+
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Carnet</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaAlumnos">
+                    <!-- Filas de alumnos asignados -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

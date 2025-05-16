@@ -1,0 +1,267 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model ITCA_Plus.Models.Grado
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+    $(document).ready(function () {
+
+        $('#actualizar').hide();
+        load();
+
+        function load() {
+            $.ajax({
+                url: '@Url.Action("GetGrados", "GradoMateria")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#tbody').empty();
+                    if (data.length > 0) {
+                        data.forEach((grado, index) => {
+                            $('#tbody').append(`
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${grado.nombre}</td>
+                                    <td>${grado.seccion}</td>
+                                    <td>${grado.nivel}</td>
+                                    <td>
+                                        <a href="#" class="me-2" onclick="cargarUpdate('${grado.id}')" data-bs-toggle="modal" data-bs-target="#modalGrado" title="Editar">
+                                            <i class="fa-solid fa-pen fa-lg text-warning"></i>
+                                        </a>
+                                        <a href="/GradoMateria/Asignar?id=${grado.id}" title="Asignar">
+                                            <i class="fa-solid fa-users fa-lg text-primary"></i>
+                                        </a>
+                                    </td>
+                                </tr>`);
+                        });
+                    } else {
+                        $('#tbody').append('<tr><td colspan="3" class="text-center">No hay grados.</td></tr>');
+                    }
+                },
+                error: function () {
+                    alert('Error al cargar los grados.');
+                }
+            });
+        }
+
+        $(document).on('submit', '#formGrado', function (e) {
+            e.preventDefault();
+            
+            var formData = $(this).serialize();
+            console.log(formData);
+            var isUpdate = $('#actualizar').is(':visible');
+
+            $.ajax({
+                url: isUpdate ? '@Url.Action("ActualizarGrado", "GradoMateria")' : '@Url.Action("AgregarGrado", "GradoMateria")',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire(isUpdate ? 'Grado actualizado' : 'Grado registrado', '', 'success').then(() => {
+                            $('#idGrado').val('');
+                            $('#btnCerrarModal').click();
+                            load();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                }
+            });
+        });
+
+        $('#eliminar').on('click', function () {
+            var id = $("#idGrado").val();
+
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "El grado será eliminado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("EliminarGrado", "GradoMateria")',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire('Eliminado', response.message, 'success').then(() => {
+                                    $('#idGrado').val('');
+                                    $('#btnCerrarModal').click();
+                                    load();
+                                });
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+    function cargarUpdate(id) {
+        $.ajax({
+            url: '@Url.Action("GetGrado", "GradoMateria")',
+            type: 'GET',
+            data: { id: id },
+            success: function (data) {
+                if (data.success) {
+                    $('#id').val(data.grado.id);
+                    const nombreValor = data.grado.nombre + '-' + data.grado.nivel;
+                    $('#nombre').val(nombreValor);
+                    $('#seccion').val(data.grado.seccion);
+
+                    $('#actualizar').show();
+                    $('#guardar').hide();
+                } else {
+                    alert('No se pudieron cargar los datos del grado.');
+                }
+            }
+        });
+    }
+
+  
+    function Limpiar() {
+        const form = document.querySelector('#formGrado');
+        $('#guardar').show();
+        $('#actualizar').hide();
+        if (form) {
+            // Quitar validaciones visuales
+            form.classList.remove('was-validated');
+
+            // Limpiar todos los select
+            const selects = form.querySelectorAll('select');
+            selects.forEach(select => {
+                select.value = '';
+                select.classList.remove('is-valid', 'is-invalid');
+            });
+
+            // Limpiar inputs si tuvieras más
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('is-valid', 'is-invalid');
+            });
+        }
+    }
+
+</script>
+
+<main class="container d-flex align-items-center justify-content-center min-vh-100">
+
+    <div class="container d-flex justify-content-center align-items-center pt-4">
+        <div class="card" style="width: 800px;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #435D7D;">
+                <h5 class="mb-0 text-white">Listado de grados</h5>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalGrado">
+                    <i class="fa-solid fa-circle-plus"></i> Agregar Grado
+                </button>
+            </div>
+
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr style="color: #435D7D;">
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Seccion</th>
+                            <th>Nivel</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="modalGrado" tabindex="-1" aria-labelledby="modalDocenteLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow border-0">
+            <div class="modal-header bg-success text-white rounded-top-4">
+                <h5 class="modal-title" id="modalDocenteLabel">Agregar Docente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar" id="btnCerrarModal"  onclick="Limpiar()"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formGrado" class="needs-validation" novalidate>              
+                    <div class="row justify-content-center my-2">
+                        <input type="hidden" id="id" name="id"/>
+                        <div class="col-auto">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <select class="form-select" id="nombre" name="nombre" required>
+                                <option value="">Selecciona el Nombre</option>
+                                <option value="Primero-1">Primero</option>
+                                <option value="Segundo-2">Segundo</option>
+                                <option value="Tercero-3">Tercero</option>
+                                <option value="Cuarto-4">Cuarto</option>
+                                <option value="Quinto-5">Quinto</option>
+                                <option value="Sexto-6">Sexto</option>
+                                <option value="Séptimo-7">Séptimo</option>
+                                <option value="Octavo-8">Octavo</option>
+                                <option value="Noveno-9">Noveno</option>
+                            </select>
+                            <div class="invalid-feedback">Seleccione un nombre válido.</div>
+                        </div>
+                    </div>
+
+                        <div class="row justify-content-center mb-5">
+                            <div  class="col-auto">
+                                <label for="seccion" class="form-label">Sección</label>
+                                <select class="form-select" id="seccion" name="seccion" required>
+                                    <option value="">Selecciona la Sección</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                </select>
+                                <div class="invalid-feedback">Seleccione una sección válida.</div>
+                            </div>                        
+                        </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button type="submit" class="btn btn-success rounded-pill" id="guardar">
+                            <i class="bi bi-plus-circle me-2"></i> Registrar Grado
+                        </button>
+
+                        <button type="submit" class="btn btn-success rounded-pill" id="actualizar">
+                            <i class="bi bi-arrow-clockwise"></i> Actualizar Grado
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Validación Bootstrap 5
+        (function () {
+            'use strict'
+
+            // Obtener todos los formularios a validar
+            var forms = document.querySelectorAll('.needs-validation')
+
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+

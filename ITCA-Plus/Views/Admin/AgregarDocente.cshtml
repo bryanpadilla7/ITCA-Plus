@@ -15,9 +15,30 @@
 <script>
     $(document).ready(function () {
 
-        $('#actualizar').addClass('d-none');
-
+        $('#actualizar').hide();
+        $('#eliminar').hide();
         load();
+
+        function cargarMaterias() {
+            $.ajax({
+                url: '@Url.Action("GetMaterias", "Admin")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#especialidad').empty().append('<option value="">Selecciona la Especialidad</option>');
+                    data.forEach(function (materia) {
+                        $('#especialidad').append(`<option value="${materia.nombre}">${materia.nombre}</option>`);
+                    });
+                },
+                error: function () {
+                    alert('Error al cargar las materias.');
+                }
+            });
+        }
+
+        // Ejecutar al cargar el modal o la página:
+        cargarMaterias();
+
 
         function load() {
             $.ajax({
@@ -31,15 +52,16 @@
                             $('#tbody').append(`
                                 <tr>
                                     <td>${index + 1}</td>
-                                    <td>${user.nombre}</td>
-                                    <td>${user.tel}</td>
+                                    <td>${user.nombre_docente}</td>
+                                    <td>${user.telefono}</td>
                                     <td>${user.correo}</td>
-                                    <td>${user.usuario}</td>
+                                    <td>${user.carnet}</td>
+                                    <td>${user.especialidad}</td>
                                     <td>
-                                        <a href="#" class="me-2" onclick="cargarUpdate('${user.usuario}')" data-bs-toggle="modal" data-bs-target="#modalDocente" title="Editar">
+                                        <a href="#" class="me-2" onclick="cargarUpdate('${user.carnet}')" data-bs-toggle="modal" data-bs-target="#modalDocente" title="Editar">
                                             <i class="fa-solid fa-pen fa-lg text-warning"></i>
                                         </a>
-                                        <a href="#" onclick="cargarDelete('${user.usuario}')" data-bs-toggle="modal" data-bs-target="#modalDocente" title="Eliminar">
+                                        <a href="#" onclick="cargarDelete('${user.carnet}')" data-bs-toggle="modal" data-bs-target="#modalDocente" title="Eliminar">
                                             <i class="fa-solid fa-trash fa-lg text-danger"></i>
                                         </a>
                                     </td>
@@ -54,6 +76,8 @@
                 }
             });
         }
+
+
 
         $(document).on('submit', '#formDocente', function (e) {
             e.preventDefault();
@@ -78,8 +102,43 @@
                     }
                 }
             });
+        });
+
+         // Eliminar Docente
+        document.getElementById('eliminar').addEventListener('click', function () {
+            var id = $("#id").val();
+
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "El docente será desactivado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("EliminarDocente", "Admin")',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire('Eliminado', response.message, 'success').then(() => {
+                                    $('#idDocente').val('');
+                                    $('#btnCerrarModal').click();
+                                    load(); // 🔥 Ya no te dará error
+                                });
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        }
+                    });
+                }
             });
         });
+        // fin de document ready
+    });
+
 
     function cargarUpdate(usuario) {
         $.ajax({
@@ -88,7 +147,7 @@
             data: { usuario: usuario },
             success: function (data) {
                 if (data.success) {
-                    $('#Id').val(data.usuario.id);
+                    $('#id').val(data.usuario.id);
                     $('#formDocente input[name="nombre"]').val(data.usuario.nombre);
                     $('#formDocente input[name="tel"]').val(data.usuario.tel);
                     $('#formDocente input[name="correo"]').val(data.usuario.correo);
@@ -102,8 +161,9 @@
                         $('#previewFoto').attr('src', '#').addClass('d-none');
                     }
 
-                    $('#guardar').addClass('d-none');
-                    $('#actualizar').removeClass('d-none');
+                    $('#actualizar').show();
+                    $('#guardar').hide();
+                    $('#eliminar').hide();
                 } else {
                     alert('No se pudieron cargar los datos del docente.');
                 }
@@ -113,6 +173,41 @@
             }
         });
     }
+
+
+    function cargarDelete(usuario) {
+    $.ajax({
+        url: '@Url.Action("GetDoc", "Admin")',
+        type: 'GET',
+        data: { usuario: usuario },
+        success: function (data) {
+            if (data.success) {
+                $('#id').val(data.usuario.id);
+                $('#formDocente input[name="nombre"]').val(data.usuario.nombre);
+                $('#formDocente input[name="tel"]').val(data.usuario.tel);
+                $('#formDocente input[name="correo"]').val(data.usuario.correo);
+                $('#formDocente input[name="contrasena"]').val(data.usuario.contrasena);
+                $('#formDocente select[name="especialidad"]').val(data.especialidad);
+
+                if (data.usuario.fotografia) {
+                    let base64Image = "data:image/png;base64," + data.usuario.fotografia;
+                    $('#previewFoto').attr('src', base64Image).removeClass('d-none');
+                } else {
+                    $('#previewFoto').attr('src', '#').addClass('d-none');
+                }
+
+                $('#guardar').hide();
+                $('#eliminar').show();
+                $('#actualizar').hide();
+            } else {
+                alert('No se pudieron cargar los datos del docente.');
+            }
+        },
+        error: function () {
+            alert('Error al cargar los datos.');
+        }
+    });
+}
 
     function mostrarPreview(event) {
         const input = event.target;
@@ -152,8 +247,9 @@
 
                 form.classList.remove('was-validated');
 
-                $('#guardar').removeClass('d-none');
-                $('#actualizar').addClass('d-none');
+                $('#guardar').show();
+                $('#actualizar').hide();
+                $('#eliminar').hide();
             });
         }
 
@@ -180,9 +276,6 @@
                 <h5 class="mb-0 text-white">Listado de docentes</h5>
 
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-danger">
-                        <i class="fa-solid fa-circle-minus"></i> Borrar
-                    </button>
                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDocente" id="btnNuevo">
                         <i class="fa-solid fa-circle-plus"></i> Agregar docente
                     </button>
@@ -198,6 +291,7 @@
                             <th>Tel</th>
                             <th>Correo</th>
                             <th>Carnet</th>
+                            <th>Especialidad</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -225,7 +319,7 @@
                     <div class="row g-4">
                         <!-- Columna izquierda -->
                         <div class="col-md-7">
-                            <input type="hidden" name="Id" id="Id" />
+                            <input type="hidden" name="Id" id="id" />
                             <div class="mb-3">
                                 @Html.LabelFor(m => m.nombre, new { @class = "form-label" })
                                 <div class="input-group">
@@ -263,11 +357,10 @@
                             </div>
 
                             <div class="mb-3">
-                                @Html.Label("Especialidad", new { @class = "form-label" })
-                                @Html.DropDownList("especialidad", new SelectList(new[]
-                                {
-                                    "Matemáticas","Sociales", "Lenguaje", "Ciencias", "Estudios Sociales", "Educación Física", "Computación", "Arte"
-                                }), "Seleccione una especialidad", new { @class = "form-select", required = "required", style = "max-width: none" })
+                                <label for="especialidad" class="form-label">Especialidad</label>
+                                <select class="form-select" id="especialidad" name="especialidad" required style="max-width:none">
+                                    <option value="">Selecciona la Especialidad</option>
+                                </select>
                                 <div class="invalid-feedback">Seleccione una especialidad válida.</div>
                             </div>
                         </div>
@@ -290,7 +383,11 @@
                         </button>
 
                         <button type="submit" class="btn btn-success rounded-pill" id="actualizar">
-                            <i class="bi bi-plus-circle me-2"></i> Actualizar Docente
+                            <i class="bi bi-arrow-clockwise"></i> Actualizar Docente
+                        </button>
+
+                        <button type="button" class="btn btn-danger rounded-pill" id="eliminar">
+                            <i class="bi bi-x-circle"></i> Eliminar Docente
                         </button>
                     </div>
                 </form>

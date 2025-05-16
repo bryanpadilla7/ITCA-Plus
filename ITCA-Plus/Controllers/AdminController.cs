@@ -20,18 +20,34 @@ namespace ITCA_Plus.Controllers
         }
 
         [HttpGet]
+        public ActionResult GetMaterias()
+        {
+            var materias = db.Materia
+                .Select(m => new {
+                    m.id,
+                    m.nombre
+                })
+                .ToList();
+
+            return Json(materias, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpGet]
         public ActionResult GetDocente()
         {
-            var docentes = db.Usuarios
-                 .Where(x => x.rol == "Docente")
-                 .Select(x => new {
-                     x.nombre,
-                     x.tel,
-                     x.usuario,
-                     x.correo,
-                     x.Token
-                 })
-                 .ToList();
+
+            var docentes = db.vw_PerfilDocente.Where(x => x.estado == true).Select(x => new
+            {
+                x.docente_id,
+                x.usuario_id,
+                x.nombre_docente,
+                x.telefono,
+                x.carnet,
+                x.correo,
+                x.estado,
+                x.especialidad
+            }).ToList();
 
             return Json(docentes, JsonRequestBehavior.AllowGet);
 
@@ -192,14 +208,12 @@ namespace ITCA_Plus.Controllers
                 }
             }
 
-            db.Entry(usuarioBD).State = EntityState.Modified;
 
             // Actualizar especialidad en tabla Docente
             var docenteBD = db.Docente.FirstOrDefault(d => d.usuario_id == usuario.id);
             if (docenteBD != null)
             {
                 docenteBD.especialidad = especialidad;
-                db.Entry(docenteBD).State = EntityState.Modified;
             }
 
             db.SaveChanges();
@@ -207,7 +221,21 @@ namespace ITCA_Plus.Controllers
             return Json(new { success = true, message = "Docente actualizado correctamente." });
         }
 
+        [HttpPost]
+        public ActionResult EliminarDocente(int id)
+        {
+            var usuarioBD = db.Usuarios.FirstOrDefault(x => x.id == id);
 
+            if (usuarioBD == null)
+            {
+                return Json(new { success = false, message = "Docente no encontrado." });
+            }
+
+            usuarioBD.estado = false;        
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Docente desactivado correctamente." });
+        }
         public ActionResult Materia()
         {
             return View();
@@ -216,7 +244,7 @@ namespace ITCA_Plus.Controllers
         [HttpGet]
         public ActionResult listaMaterias()
         {
-            var materias = db.Materia.Select(x => new
+            var materias = db.Materia.Where(x=> x.estado == true).Select(x => new
             {
                 x.id,
                 x.nombre
@@ -258,7 +286,7 @@ namespace ITCA_Plus.Controllers
             if (materia == null)
                 return Json(new { success = false, message = "Materia no encontrada." });
 
-            db.Materia.Remove(materia);
+            materia.estado = false; // Cambia el estado a inactivo
             db.SaveChanges();
 
             return Json(new { success = true, message = "Materia eliminada correctamente." });

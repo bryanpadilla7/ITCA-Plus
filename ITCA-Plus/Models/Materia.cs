@@ -24,8 +24,9 @@ namespace ITCA_Plus.Models
         }
     
         public int id { get; set; }
-        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [Required(ErrorMessage = "nombre de la materia requerido")]
         public string nombre { get; set; }
+        public bool estado { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Asistencia> Asistencia { get; set; }
