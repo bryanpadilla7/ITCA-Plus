@@ -219,17 +219,17 @@
 <!--Card que muestra los datos filtrados-->
 <div class="container d-flex justify-content-center align-items-center mt-5">
     <div class="card" style="width: 800px;">
-        <h5 class="card-header text-center" style="background-color: #aeb6bf;">Resultados de la búsqueda</h5>
+        <h5 class="card-header text-center text-white" style="background-color: #435D7D;">Resultados de la búsqueda</h5>
         <div class="card-body">
             @if (ViewBag.ListadoPorMateriaGrado != null && Listado.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table table-striped table-bordered table-hover">
+                    <table class="table">
                         <thead>
-                            <tr>
-                                <td>Carnet</td>
-                                <td>Nombre Alumno</td>
-                                <td>Registro</td>
+                            <tr style="color: #435D7D;">
+                                <td class="fw-bold">Carnet</td>
+                                <td class="fw-bold">Nombre Alumno</td>
+                                <td class="fw-bold">Registro</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -281,21 +281,21 @@
 
 <!-- NotasPorAlumnoModal -->
 <div class="modal fade" id="NotasPorAlumnoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Notas por alumno</h5>
+            <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: #435D7D;">
+                <h5 class="modal-title text-white" id="exampleModalLabel">Notas por alumno</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <table class="table table table-striped table-bordered table-hover">
+                <table class="table">
                     <thead>
-                        <tr>
-                            <td class="scope text-center">Periodo</td>
-                            <td class="text-center">Notas 1°</td>
-                            <td class="text-center">Notas 2°</td>
-                            <td class="text-center">Notas 3°</td>
-                            <td class="scope text-center">Promedio</td>
+                        <tr style="color: #435D7D;">
+                            <td class="scope text-center text-bold">Periodo</td>
+                            <td class="text-center fw-bold">Notas 1°</td>
+                            <td class="text-center fw-bold">Notas 2°</td>
+                            <td class="text-center fw-bold">Notas 3°</td>
+                            <td class="scope text-center fw-bold">Promedio</td>
                         </tr>
                     </thead>
                     <tbody id="notas-body">
@@ -304,9 +304,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="btnGuardar" class="btn btn-outline-danger">
-                    <i class="fa-solid fa-envelope"></i> Enviar al correo
-                </button>
+               
             </div>
         </div>
     </div>
@@ -315,21 +313,21 @@
 <div class="modal fade" id="grupalNotasModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Notas Grupales</h5>
+            <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: #435D7D;"">
+                <h5 class="modal-title text-white" id="exampleModalLabel">Notas Grupales</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <table class="table table table-striped table-bordered table-hover">
+                <table class="table">
                     <thead>
-                        <tr>
-                            <td class="scope text-center>Periodo</td>
-                            <td class="text-center">Carnet</td>
-                            <td class="text-center">Nombre alumno</td>
-                            <td class="text-center">Notas 1°</td>
-                            <td class="text-center">Notas 2°</td>
-                            <td class="text-center">Notas 3°</td>
-                            <td class="scope text-center">Promedio</td>
+                        <tr style="color: #435D7D;">
+                            <td class="scope text-center text-bold">Periodo</td>
+                            <td class="text-center fw-bold">Carnet</td>
+                            <td class="text-center fw-bold">Nombre alumno</td>
+                            <td class="text-center fw-bold">Notas 1°</td>
+                            <td class="text-center fw-bold">Notas 2°</td>
+                            <td class="text-center fw-bold">Notas 3°</td>
+                            <td class="scope text-center fw-bold">Promedio</td>
                         </tr>
                     </thead>
                     <tbody id="notas-body">
@@ -338,9 +336,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="btnGuardar" class="btn btn-outline-danger">
-                    <i class="fa-solid fa-envelope"></i> Enviar al correo
-                </button>
+                
             </div>
         </div>
     </div>
