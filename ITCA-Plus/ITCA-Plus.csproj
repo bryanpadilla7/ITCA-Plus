@@ -339,6 +339,8 @@
     <Content Include="Views\Admin\Materia.cshtml" />
     <Content Include="Views\GradoMateria\Index.cshtml" />
     <Content Include="Views\GradoMateria\Asignar.cshtml" />
+    <Content Include="Views\Materia\Index.cshtml" />
+    <Content Include="Views\Materia\ListaFechasAsistencia.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

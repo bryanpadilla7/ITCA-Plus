@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using ITCA_Plus.Models;
+using System.Timers;
 
 namespace ITCA_Plus.Controllers
 {
@@ -41,22 +42,26 @@ namespace ITCA_Plus.Controllers
             string accion = Request.Form["boton"].ToString();
             string eliminacion = Request.Form["eliminacion"].ToString();
             string modificacion = Request.Form["modificacion"].ToString();
+            string guardar = Request.Form["guardar"].ToString();
 
             switch (accion)
             {
                 case "Guardar":
-                    if (fotoAlumno != null && fotoAlumno.ContentLength > 0)
+                    if (guardar.Equals("si"))
                     {
-                        using (var binaryAlumno = new BinaryReader(fotoAlumno.InputStream))
+                        if (fotoAlumno != null && fotoAlumno.ContentLength > 0)
                         {
-                            a.fotografia = binaryAlumno.ReadBytes(fotoAlumno.ContentLength);
+                            using (var binaryAlumno = new BinaryReader(fotoAlumno.InputStream))
+                            {
+                                a.fotografia = binaryAlumno.ReadBytes(fotoAlumno.ContentLength);
+                            }
                         }
-                    }
 
-                    a.carnet = GenerarCarnet();
-                    contexto.Alumno.Add(a);
-                    contexto.SaveChanges();
-                    HelperNotify.Notificar(this, "Registro agregado correctamente", "success");
+                        a.carnet = GenerarCarnet();
+                        contexto.Alumno.Add(a);
+                        contexto.SaveChanges();
+                        HelperNotify.Notificar(this, "Registro agregado correctamente", "success");
+                    }
                     break;
                 case "Modificar":
                     if (modificacion.Equals("si"))

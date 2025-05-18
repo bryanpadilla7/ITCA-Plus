@@ -11,6 +11,10 @@
     }
 }
 
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+}
 
 
 <script>
@@ -32,7 +36,6 @@
             imgPreview.classList.add("d-none");
         }
 
-        // Cambiar textos y mostrar/ocultar botones
         document.getElementById("alumnoModalLabel").innerText = "Eliminar registro";
         $("#btnEliminar").show();
         $("#btnGuardar").hide();
@@ -48,6 +51,7 @@
     }
 
     function cargarUpdate(car, nom, fec, gen, idAlumno) {
+        document.getElementById("txtCarnet_visible").value = car;
         document.getElementById("txtCarnet").value = car;
         document.getElementById("txtNombre").value = nom;
         const [day, month, year] = fec.split('/');
@@ -55,8 +59,6 @@
         document.getElementById("txtFechaNacimiento").value = isoDate;
         document.getElementById("txtGenero").value = gen;
 
-        // Actualizar la imagen de previsualización.
-        // Se utiliza la acción "convertirImagen" y se pasa el parámetro "codAlumno" con el id del alumno.
         var imgPreview = document.getElementById("imgPreview");
         if (idAlumno) {
             imgPreview.src = '@Url.Action("convertirImagen", "Alumno")' + '?codAlumno=' + idAlumno;
@@ -66,33 +68,83 @@
             imgPreview.classList.add("d-none");
         }
 
-        // Cambiar textos y mostrar/ocultar botones
         document.getElementById("alumnoModalLabel").innerText = "Actualizar registro";
         $("#btnEliminar").hide();
         $("#btnGuardar").hide();
         $("#btnModificar").show();
     }
 
-    function confirmarUpdate() {
-        if (confirm("Estas seguro de modificar el alumno?")) {
-            document.getElementById("modificacion").value = "si";
-        } else {
-            document.getElementById("modificacion").value = "no";
+    function confirmarUpdate(event) {
+        event.preventDefault();
+        const form = event.target.form;
+
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
         }
+
+        document.getElementById("hdnAccion").value = "Modificar";
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Se modificará el registro del alumno.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, modificar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("modificacion").value = "si";
+                form.submit(); // Envía el formulario manualmente
+            } else {
+                document.getElementById("modificacion").value = "no";
+            }
+        });
+    }
+
+    function confirmarSave(event) {
+        event.preventDefault();
+        const form = event.target.form;
+
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
+        document.getElementById("hdnAccion").value = "Guardar";
+
+        Swal.fire({
+            title: 'Nuevo registro',
+            text: "Al confirmar se guardará el registro",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, guardar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("guardar").value = "si";
+                form.submit(); 
+            } else {
+                document.getElementById("guardar").value = "no";
+            }
+        });
     }
 
     function cargarNuevo() {
-        document.getElementById("txtCarnet").value = "@ViewBag.nuevoCarnet";
+        const nuevo = "@ViewBag.nuevoCarnet";
+
+        document.getElementById("txtCarnet_visible").value = nuevo;
+        document.getElementById("txtCarnet").value = nuevo;
         document.getElementById("txtNombre").value = "";
         document.getElementById("txtFechaNacimiento").value = "";
 
         var imgPreview = document.getElementById("imgPreview");
         imgPreview.src = "#";
         imgPreview.classList.add("d-none");
-
-        //$("#btnGuardar").show();
-        //$("#btnEliminar").hide();
-        //$("#btnModificar").hide();
     }
 
     $(document).ready(function () {
@@ -120,7 +172,7 @@
                 <h1 class="modal-title fs-5" id="alumnoModalLabel">Nuevo registro</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            @using (Html.BeginForm("AgregarAlumnos", "Alumno", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            @using (Html.BeginForm("AgregarAlumnos", "Alumno", FormMethod.Post, new { enctype = "multipart/form-data", @class = "needs-validation", novalidate = "novalidate" }))
             {
                 <div class="modal-body">
                     <div class="row">
@@ -154,7 +206,8 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     @Html.Label("Carnet")
-                                    @Html.TextBoxFor(a => a.carnet, new { @class = "form-control", @readonly = "readonly", style = "max-width: none;", id = "txtCarnet", required = "required" })
+                                    @Html.TextBox("carnet_mostrado", Model?.carnet, new { @class = "form-control", disabled = "disabled" ,style = "max-width: none;", id = "txtCarnet_visible" })
+                                    @Html.HiddenFor(a => a.carnet, new { id="txtCarnet" })
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     @Html.Label("Nombre alumno")
@@ -183,13 +236,15 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <input type="hidden" name="eliminacion" id="eliminacion" value="" />
-                    <input type="hidden" name="modificacion" id="modificacion" value="" />
+                    <input type="hidden" name="boton" id="hdnAccion" value="" />
+                    <input type="hidden" name="eliminacion" id="eliminacion" value="no" />
+                    <input type="hidden" name="guardar" id="guardar" value="no" />
+                    <input type="hidden" name="modificacion" id="modificacion" value="no" />
 
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" name="boton" value="Guardar" id="btnGuardar" class="btn btn-primary">Guardar</button>
-                    <button type="submit" name="boton" value="Modificar" onclick="javascript: confirmarUpdate()" id="btnModificar" class="btn btn-warning">Modificar</button>
-                    <button type="submit" name="boton" value="Eliminar" onclick="javascript: confirmarDelete()" id="btnEliminar" class="btn btn-danger">Eliminar</button>
+                    <button type="submit" value="Guardar" onclick="confirmarSave(event)" id="btnGuardar" class="btn btn-primary">Guardar</button>
+                    <button type="submit" value="Modificar" onclick="confirmarUpdate(event)" id="btnModificar" class="btn btn-warning">Modificar</button>
+                    @*<button type="submit" name="boton" value="Eliminar" onclick="javascript: confirmarDelete()" id="btnEliminar" class="btn btn-danger">Eliminar</button>*@
                 </div>
             }
         </div>
@@ -203,9 +258,6 @@
             <h5 class="mb-0 text-white">Listado de alumnos</h5>
 
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-danger">
-                    <i class="fa-solid fa-circle-minus"></i> Borrar
-                </button>
                 <button type="button" onclick="cargarNuevo()" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#alumnoModal" id="btnNuevo">
                     <i class="fa-solid fa-circle-plus"></i> Agregar nuevo alumno
                 </button>
@@ -266,16 +318,17 @@
                                        title="Editar">
                                         <i class="fa-solid fa-pen fa-lg text-warning"></i>
                                     </a>
-                                    <a href=""
-                                       style="text-decoration:none;"
-                                       onclick="javascript: cargarDelete('@item.carnet','@item.nombre','@Convert.ToDateTime(item.fecha_nacimiento).ToString("dd/MM/yyyy")','@item.genero', '@item.id')"
-                                       data-bs-toggle="modal"
-                                       data-bs-target="#alumnoModal"
-                                       data-toggle="tooltip"
-                                       data-placement="top"
-                                       title="Eliminar">
-                                        <i class="fa-solid fa-trash fa-lg text-danger"></i>
-                                    </a>
+                                    @*<a href=""
+                                           style="text-decoration:none;"
+                                           onclick="javascript: cargarDelete('@item.carnet','@item.nombre','@Convert.ToDateTime(item.fecha_nacimiento).ToString("dd/MM/yyyy")','@item.genero', '@item.id')"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#alumnoModal"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Eliminar">
+                                            <i class="fa-solid fa-trash fa-lg text-danger"></i>
+                                        </a>
+                                    *@
                                 </td>
                             </tr>
                         }

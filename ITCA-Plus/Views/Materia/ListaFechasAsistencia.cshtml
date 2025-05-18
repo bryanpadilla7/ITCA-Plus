@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewBag.Title = "ListaFechasAsistencia";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cliente = Session["cuenta"] as ITCA_Plus.Models.Usuarios;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Asistencia por trimestre</h2>
+    <a href="@Url.Action("Index","Materia")" class="btn btn-outline-dark">
+        <i class="fa-solid fa-angle-left"></i> Regresar
+    </a>
+</div>
+
+<div class="accordion" id="accordionTrimestres"></div>
+
+<script>
+    // Parámetros que necesitas pasar
+    const materiaId      = @Request.QueryString["materiaId"] ?? 0;
+    const nombreMateria  = '@Request.QueryString["nombreMateria"]';
+    const docenteId      = @cliente.id;
+    const grado = '@Request.QueryString["grado"]';
+    const gradoId= @Request.QueryString["gradoId"] ?? 0;
+    const seccion        = '@Request.QueryString["seccion"]';
+    const horario        = '07:00 AM - 12:00 PM';
+
+    const inicio = new Date(new Date().getFullYear(), 0, 6);
+    const semanasPorTrim = 13;
+    const trimestres = [
+      { titulo: 'Primer Trimestre', offsetSem: 0 },
+      { titulo: 'Segundo Trimestre', offsetSem: 13 },
+      { titulo: 'Tercer Trimestre', offsetSem: 26 }
+    ];
+
+    $(function() {
+      const container = $('#accordionTrimestres');
+
+      trimestres.forEach((t, idx) => {
+        const idHeader = 'heading' + idx;
+        const idBody   = 'collapse' + idx;
+        const holderId = 'fechas-' + idx;
+
+        container.append(`
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="${idHeader}">
+              <button class="accordion-button ${idx > 0 ? 'collapsed' : ''}"
+                      style="background-color: #435D7D; color: white;"
+                      type="button" data-bs-toggle="collapse"
+                      data-bs-target="#${idBody}"
+                      aria-expanded="${idx===0}" aria-controls="${idBody}">
+                <strong>${t.titulo}</strong>
+              </button>
+            </h2>
+            <div id="${idBody}" class="accordion-collapse collapse ${idx===0?'show':''}" aria-labelledby="${idHeader}" data-bs-parent="#accordionTrimestres">
+              <div class="accordion-body p-0">
+                <div id="${holderId}" class="list-group"></div>
+              </div>
+            </div>
+          </div>`);
+
+        // Calcular fechas
+        const fechas = [];
+        const start = new Date(inicio);
+        start.setDate(start.getDate() + t.offsetSem * 7);
+        const end = new Date(start);
+        end.setDate(end.getDate() + semanasPorTrim * 7 - 1);
+
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
+          const dow = d.getDay();
+          if (dow >= 1 && dow <= 5) fechas.push(new Date(d));
+        }
+
+        // Agrupar por mes
+        const porMes = {};
+        fechas.forEach(dt => {
+          const mes = dt.toLocaleString('default',{ month:'long' });
+          porMes[mes] = porMes[mes]||[];
+          porMes[mes].push(new Date(dt));
+        });
+
+        // Renderizar como list-group
+        const listContainer = $(`#${holderId}`);
+        Object.entries(porMes).forEach(([mes, arr]) => {
+            listContainer.append(`<div class="list-group-item"style="background-color: #D9EBF1;"><strong><i>${mes}</i></strong></div>`);
+          arr.forEach(d => {
+            const fechaISO = d.toISOString().split('T')[0]; // yyyy-mm-dd
+            const label = d.toLocaleDateString('es-ES',{ weekday:'long', day:'numeric', month:'numeric' });
+              const url = `@Url.Action("Asistencia","Materia")`
+                      + `?gradoId=${gradoId}`
+                      + `&materiaId=${materiaId}`
+                      + `&fecha=${fechaISO}`
+                      + `&nombreMateria=${encodeURIComponent(nombreMateria)}`
+                      + `&docenteId=${docenteId}`
+                      + `&grado=${encodeURIComponent(grado)}`
+                      + `&seccion=${encodeURIComponent(seccion)}`
+                      + `&horario=${encodeURIComponent(horario)}`;
+            listContainer.append(`
+              <a href="${url}"
+                 class="list-group-item list-group-item-action">
+                ${label} - ${horario}
+              </a>`);
+          });
+        });
+      });
+    });
+</script>
