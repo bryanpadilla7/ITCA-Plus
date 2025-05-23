@@ -1,33 +1,165 @@
-﻿@{
+﻿@model ITCA_Plus.Models.Usuarios
+@{
     ViewBag.Title = "Home Page";
 }
+<main class="container">
+    <div class="card shadow-sm p-4">
+        <div class="d-flex align-items-center mb-4">
+            @if (ViewBag.Fotografia != null)
+            {
+                <img src="data:image/jpeg;base64,@ViewBag.Fotografia" alt="Foto de perfil" class="rounded-circle me-4" style="width: 100px; height: 100px; object-fit: cover;" />
+            }
+            else
+            {
+                <div class="me-4">
+                    <i class="bi bi-person-circle fs-1 text-secondary"></i>
+                </div>
+            }
 
-<main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="title">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-    </section>
+            <div>
+                <h2 class="mb-1">Bienvenido, <span class="text-primary">@ViewBag.Nombre</span></h2>
+                <p class="mb-0"><strong>Correo:</strong> @ViewBag.Correo</p>
+                <p class="mb-0"><strong>Rol:</strong> <span class="badge bg-secondary">@ViewBag.Rol</span></p>
+            </div>
+        </div>
 
-    <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>
-                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-                enables a clean separation of concerns and gives you full control over markup
-                for enjoyable, agile development.
-            </p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-        </section>
+            <hr />
+            <h3 class="mb-4">Resumen del Docente</h3>
+            <div class="row text-center">
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow bg-primary text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Especialidad</h5>
+                            <p class="card-text fs-2">@ViewBag.Especialidad</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow bg-success text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Total de Grados</h5>
+                            <p class="card-text fs-2">@ViewBag.TotalGrados</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow bg-info text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Total de Alumnos</h5>
+                            <p class="card-text fs-2">@ViewBag.TotalAlumnos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            if (ViewBag.MateriasAsignadas != null)
+            {
+                <hr />
+                <h4 class="mb-3">Grados impartidos</h4>
+                <ul class="list-group mb-4">
+                    @foreach (var m in ViewBag.MateriasAsignadas)
+                    {
+                        <li class="list-group-item">
+                            <i class="bi bi-journal-text me-2 text-primary"></i>
+                            @m.grado_nombre (<em>@m.anio_escolar</em>)
+                        </li>
+                    }
+                </ul>
+            }
+
+            <hr />
+            <h4 class="mb-3">Gráficos de Rendimiento</h4>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm p-3">
+                        <h6 class="mb-3 text-center">Promedio de notas por grado</h6>
+                        <canvas id="graficoPromedios"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm p-3">
+                        <h6 class="mb-3 text-center">Cantidad de alumnos por grado</h6>
+                        <canvas id="graficoAlumnos"></canvas>
+                    </div>
+                </div>
+                <div class="col-12 mb-4">
+                    <div class="card shadow-sm p-3">
+                        <h6 class="mb-3 text-center">Distribución de notas</h6>
+                        <canvas id="graficoDistribucion"></canvas>
+                    </div>
+                </div>
+
+            </div>
     </div>
+
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+    // Gráfico: Promedio de notas por grado
+    new Chart(document.getElementById('graficoPromedios'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Json.Encode(ViewBag.LabelsPromedios)),
+            datasets: [{
+                label: 'Promedio Final',
+                data: @Html.Raw(Json.Encode(ViewBag.DataPromedios)),
+                backgroundColor: 'rgba(255, 193, 7, 0.7)',
+                borderColor: 'rgba(255, 193, 7, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true, max: 10 } }
+        }
+    });
+
+    // Gráfico: Cantidad de alumnos por grado
+    new Chart(document.getElementById('graficoAlumnos'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Json.Encode(ViewBag.LabelsAlumnos)),
+            datasets: [{
+                label: 'Cantidad de alumnos',
+                data: @Html.Raw(Json.Encode(ViewBag.DataAlumnos)),
+                backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                borderColor: 'rgba(40, 167, 69, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true, stepSize: 1 } }
+        }
+    });
+
+    // Gráfico: Distribución de notas
+    new Chart(document.getElementById('graficoDistribucion'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Json.Encode(ViewBag.LabelsDistribucion)),
+            datasets: [{
+                label: 'Cantidad de estudiantes',
+                data: @Html.Raw(Json.Encode(ViewBag.DataDistribucion)),
+                backgroundColor: [
+                    'rgba(25, 135, 84, 0.7)',
+                    'rgba(13, 110, 253, 0.7)',
+                    'rgba(255, 193, 7, 0.7)',
+                    'rgba(220, 53, 69, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(25, 135, 84, 1)',
+                    'rgba(13, 110, 253, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(220, 53, 69, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: { x: { beginAtZero: true, stepSize: 1 } }
+        }
+    });
+</script>
