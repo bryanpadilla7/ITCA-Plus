@@ -164,7 +164,6 @@
     <Compile Include="Controllers\GradoMateriaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MateriaController.cs" />
-    <Compile Include="Controllers\mostarNotasController.cs" />
     <Compile Include="Controllers\notasController.cs" />
     <Compile Include="Controllers\ReporteController.cs" />
     <Compile Include="Controllers\ResponsableController.cs" />
@@ -324,8 +323,6 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\notas\CuadroCalificaciones.cshtml" />
     <Content Include="Views\notas\EditarNotas.cshtml" />
-    <Content Include="Views\mostarNotas\CertificadoNotas.cshtml" />
-    <Content Include="Views\mostarNotas\reportesEspeciales.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Confirmar.cshtml" />
     <Content Include="Views\Account\ResEnvio.cshtml" />
