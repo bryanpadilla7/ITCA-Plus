@@ -4,8 +4,105 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
 
-<a href="@Url.Action("AgregarDocente", "Admin")" class="text-decoration-none small">Agregar docente</a>
-<a href="@Url.Action("Materia", "Admin")" class="text-decoration-none small">Agregar Materia</a>
-<a href="@Url.Action("Index", "GradoMateria")" class="text-decoration-none small">Grado opciones</a>
+
+<div class="container mt-4">
+
+    <!-- Título principal -->
+    <h1 class="text-center mb-4">Gestión Académica</h1>
+
+    <!-- Card para listado de docentes -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Listado de Docentes</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover table-bordered align-middle text-center" id="tablaDocentes">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Carnet</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Especialidad</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Card para listado de materias -->
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">Listado de Materias</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-bordered align-middle text-center" id="tablaMaterias">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("GetDocente", "Admin")',
+                method: 'GET',
+                success: function (data) {
+                    var rows = '';
+                    data.forEach(function (d) {
+                        rows += `<tr>
+                            <td>${d.nombre_docente}</td>
+                            <td>${d.carnet}</td>
+                            <td>${d.correo}</td>
+                            <td>${d.telefono}</td>
+                            <td>${d.especialidad}</td>
+                        </tr>`;
+                    });
+                    $('#tablaDocentes tbody').html(rows);
+                },
+                error: function () {
+                    alert('Error al obtener los docentes.');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("listaMaterias", "Admin")',
+                method: 'GET',
+                success: function (response) {
+                    if (response.success) {
+                        let rows = '';
+                        response.materias.forEach(function (m) {
+                            rows += `<tr>
+                                <td>${m.id}</td>
+                                <td>${m.nombre}</td>
+                            </tr>`;
+                        });
+                        $('#tablaMaterias tbody').html(rows);
+                    } else {
+                        alert('No se pudieron cargar las materias.');
+                    }
+                },
+                error: function () {
+                    alert('Error al obtener las materias.');
+                }
+            });
+        });
+    </script>
+}

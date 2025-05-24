@@ -165,8 +165,8 @@
     <Compile Include="Controllers\GradoMateriaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MateriaController.cs" />
-    <Compile Include="Controllers\mostarNotasController.cs" />
     <Compile Include="Controllers\notasController.cs" />
+    <Compile Include="Controllers\ReporteController.cs" />
     <Compile Include="Controllers\ResponsableController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -228,6 +228,7 @@
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ResponsableViewModel.cs" />
+    <Compile Include="Models\ResumenDocenteViewModel.cs" />
     <Compile Include="Models\Usuarios.cs">
       <DependentUpon>ModeloItcaPlus.tt</DependentUpon>
     </Compile>
@@ -320,13 +321,9 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\notas\CuadroCalificaciones.cshtml" />
     <Content Include="Views\notas\EditarNotas.cshtml" />
-    <Content Include="Views\mostarNotas\CertificadoNotas.cshtml" />
-    <Content Include="Views\mostarNotas\reportesEspeciales.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Confirmar.cshtml" />
     <Content Include="Views\Account\ResEnvio.cshtml" />
@@ -341,6 +338,12 @@
     <Content Include="Views\GradoMateria\Index.cshtml" />
     <Content Include="Views\GradoMateria\Asignar.cshtml" />
     <Content Include="Views\Edition\CambiosEdicion.cshtml" />
+    <Content Include="Views\Reporte\NotasPorAlumno.cshtml" />
+    <Content Include="Views\Reporte\NotasAnuales.cshtml" />
+    <Content Include="Views\Reporte\Asistencia.cshtml" />
+    <Content Include="Views\Reporte\ReporteUsuarios.cshtml" />
+    <Content Include="Views\Reporte\ReporteGrados.cshtml" />
+    <Content Include="Views\Reporte\ReporteMaterias.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
