@@ -106,7 +106,7 @@ namespace ITCA_Plus.Controllers
             var cantidadMaterias = db.DocenteGradoMateria.Count(d => d.grado_id == id);
             var cantidadAlumnos = db.GradoAlumno.Count(d => d.grado_id == id);
 
-            var materias = db.Materia
+           var materias = db.Materia
                 .Where(m => m.estado == true)
                 .Select(m => new { m.id, m.nombre })
                 .ToList();

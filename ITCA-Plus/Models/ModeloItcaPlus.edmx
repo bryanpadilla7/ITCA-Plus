@@ -155,8 +155,8 @@
           <Property Name="rol" Type="nvarchar" MaxLength="20" />
           <Property Name="estado" Type="bit" Nullable="false" />
         </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_AlumnosPorMateriaGrado' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'ITCAPlus.dbo.vw_AlumnosPorMateriaGrado' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vw_AlumnosPorMateriaGrado">
           <Key>
             <PropertyRef Name="alumno_id" />
@@ -172,8 +172,8 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_AlumnosPorMateriaGrado' no t
           <Property Name="grado" Type="nvarchar" MaxLength="22" />
           <Property Name="materia" Type="nvarchar" MaxLength="100" />
         </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_ListadoAsistencia' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'ITCAPlus.dbo.vw_ListadoAsistencia' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vw_ListadoAsistencia">
           <Key>
             <PropertyRef Name="carnet" />
@@ -187,8 +187,8 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_ListadoAsistencia' no tiene 
           <Property Name="fecha" Type="date" />
           <Property Name="estado" Type="varchar" MaxLength="8" Nullable="false" />
         </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_MateriasAsignadasDocente' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'ITCAPlus.dbo.vw_MateriasAsignadasDocente' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vw_MateriasAsignadasDocente">
           <Key>
             <PropertyRef Name="docente_id" />
@@ -204,8 +204,8 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_MateriasAsignadasDocente' no
           <Property Name="nivel" Type="tinyint" />
           <Property Name="anio_escolar" Type="int" />
         </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_NotasAnualesPorAlumno' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'ITCAPlus.dbo.vw_NotasAnualesPorAlumno' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vw_NotasAnualesPorAlumno">
           <Key>
             <PropertyRef Name="alumno_id" />
@@ -217,13 +217,14 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_NotasAnualesPorAlumno' no ti
           <Property Name="materia" Type="nvarchar" MaxLength="100" />
           <Property Name="grado" Type="nvarchar" MaxLength="22" />
           <Property Name="anio_escolar" Type="int" />
+          <Property Name="docente_id" Type="int" />
           <Property Name="Trimestre1" Type="numeric" Precision="10" Scale="4" />
           <Property Name="Trimestre2" Type="numeric" Precision="10" Scale="4" />
           <Property Name="Trimestre3" Type="numeric" Precision="10" Scale="4" />
           <Property Name="PromedioFinal" Type="numeric" Precision="38" Scale="6" />
         </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_NotasPorAlumno' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'ITCAPlus.dbo.vw_NotasPorAlumno' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vw_NotasPorAlumno">
           <Key>
             <PropertyRef Name="nota_id" />
@@ -242,9 +243,10 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_NotasPorAlumno' no tiene def
           <Property Name="nota2" Type="decimal" Precision="5" Scale="2" />
           <Property Name="nota3" Type="decimal" Precision="5" Scale="2" />
           <Property Name="promedio" Type="numeric" Precision="10" Scale="4" />
+          <Property Name="docente_id" Type="int" />
         </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'ITCAPlus.dbo.vw_PerfilDocente' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vw_PerfilDocente">
           <Key>
             <PropertyRef Name="docente_id" />
@@ -501,6 +503,7 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
     [vw_NotasAnualesPorAlumno].[materia] AS [materia], 
     [vw_NotasAnualesPorAlumno].[grado] AS [grado], 
     [vw_NotasAnualesPorAlumno].[anio_escolar] AS [anio_escolar], 
+    [vw_NotasAnualesPorAlumno].[docente_id] AS [docente_id], 
     [vw_NotasAnualesPorAlumno].[Trimestre1] AS [Trimestre1], 
     [vw_NotasAnualesPorAlumno].[Trimestre2] AS [Trimestre2], 
     [vw_NotasAnualesPorAlumno].[Trimestre3] AS [Trimestre3], 
@@ -520,7 +523,8 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
     [vw_NotasPorAlumno].[nota1] AS [nota1], 
     [vw_NotasPorAlumno].[nota2] AS [nota2], 
     [vw_NotasPorAlumno].[nota3] AS [nota3], 
-    [vw_NotasPorAlumno].[promedio] AS [promedio]
+    [vw_NotasPorAlumno].[promedio] AS [promedio], 
+    [vw_NotasPorAlumno].[docente_id] AS [docente_id]
     FROM [dbo].[vw_NotasPorAlumno] AS [vw_NotasPorAlumno]</DefiningQuery>
           </EntitySet>
           <EntitySet Name="vw_PerfilDocente" EntityType="Self.vw_PerfilDocente" store:Type="Views" store:Schema="dbo">
@@ -611,12 +615,10 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
           <EntitySet Name="DocenteMateria" EntityType="ITCAPlusModel.DocenteMateria" />
           <EntitySet Name="Grado" EntityType="ITCAPlusModel.Grado" />
           <EntitySet Name="GradoAlumno" EntityType="ITCAPlusModel.GradoAlumno" />
-          <EntitySet Name="Materia" EntityType="ITCAPlusModel.Materia" />
           <EntitySet Name="Notas" EntityType="ITCAPlusModel.Notas" />
           <EntitySet Name="notiCambioNota" EntityType="ITCAPlusModel.notiCambioNota" />
           <EntitySet Name="PeriodoEscolar" EntityType="ITCAPlusModel.PeriodoEscolar" />
           <EntitySet Name="Responsable" EntityType="ITCAPlusModel.Responsable" />
-          <EntitySet Name="Usuarios" EntityType="ITCAPlusModel.Usuarios" />
           <EntitySet Name="vw_AlumnosPorMateriaGrado" EntityType="ITCAPlusModel.vw_AlumnosPorMateriaGrado" />
           <EntitySet Name="vw_ListadoAsistencia" EntityType="ITCAPlusModel.vw_ListadoAsistencia" />
           <EntitySet Name="vw_MateriasAsignadasDocente" EntityType="ITCAPlusModel.vw_MateriasAsignadasDocente" />
@@ -646,14 +648,6 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
             <End Role="Grado" EntitySet="Grado" />
             <End Role="Asistencia" EntitySet="Asistencia" />
           </AssociationSet>
-          <AssociationSet Name="FK__Asistenci__mater__5BE2A6F2" Association="ITCAPlusModel.FK__Asistenci__mater__5BE2A6F2">
-            <End Role="Materia" EntitySet="Materia" />
-            <End Role="Asistencia" EntitySet="Asistencia" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Docente__usuario__3B75D760" Association="ITCAPlusModel.FK__Docente__usuario__3B75D760">
-            <End Role="Usuarios" EntitySet="Usuarios" />
-            <End Role="Docente" EntitySet="Docente" />
-          </AssociationSet>
           <AssociationSet Name="FK__DocenteGr__anio___5629CD9C" Association="ITCAPlusModel.FK__DocenteGr__anio___5629CD9C">
             <End Role="Docente" EntitySet="Docente" />
             <End Role="DocenteGradoMateria" EntitySet="DocenteGradoMateria" />
@@ -666,6 +660,21 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
             <End Role="Grado" EntitySet="Grado" />
             <End Role="DocenteGradoMateria" EntitySet="DocenteGradoMateria" />
           </AssociationSet>
+          <AssociationSet Name="FK__GradoAlum__grado__4F7CD00D" Association="ITCAPlusModel.FK__GradoAlum__grado__4F7CD00D">
+            <End Role="Grado" EntitySet="Grado" />
+            <End Role="GradoAlumno" EntitySet="GradoAlumno" />
+          </AssociationSet>
+          <EntitySet Name="vw_PerfilDocente" EntityType="ITCAPlusModel.vw_PerfilDocente" />
+          <EntitySet Name="Materia" EntityType="ITCAPlusModel.Materia" />
+          <EntitySet Name="Usuarios" EntityType="ITCAPlusModel.Usuarios" />
+          <AssociationSet Name="FK__Asistenci__mater__5BE2A6F2" Association="ITCAPlusModel.FK__Asistenci__mater__5BE2A6F2">
+            <End Role="Materia" EntitySet="Materia" />
+            <End Role="Asistencia" EntitySet="Asistencia" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Docente__usuario__3B75D760" Association="ITCAPlusModel.FK__Docente__usuario__3B75D760">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="Docente" EntitySet="Docente" />
+          </AssociationSet>
           <AssociationSet Name="FK__DocenteGr__mater__571DF1D5" Association="ITCAPlusModel.FK__DocenteGr__mater__571DF1D5">
             <End Role="Materia" EntitySet="Materia" />
             <End Role="DocenteGradoMateria" EntitySet="DocenteGradoMateria" />
@@ -674,15 +683,10 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
             <End Role="Materia" EntitySet="Materia" />
             <End Role="DocenteMateria" EntitySet="DocenteMateria" />
           </AssociationSet>
-          <AssociationSet Name="FK__GradoAlum__grado__4F7CD00D" Association="ITCAPlusModel.FK__GradoAlum__grado__4F7CD00D">
-            <End Role="Grado" EntitySet="Grado" />
-            <End Role="GradoAlumno" EntitySet="GradoAlumno" />
-          </AssociationSet>
           <AssociationSet Name="FK__Notas__materia_i__6754599E" Association="ITCAPlusModel.FK__Notas__materia_i__6754599E">
             <End Role="Materia" EntitySet="Materia" />
             <End Role="Notas" EntitySet="Notas" />
           </AssociationSet>
-          <EntitySet Name="vw_PerfilDocente" EntityType="ITCAPlusModel.vw_PerfilDocente" />
         </EntityContainer>
         <EntityType Name="Alumno">
           <Key>
@@ -730,9 +734,9 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="usuario_id" Type="Int32" />
           <Property Name="especialidad" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Usuarios" Relationship="ITCAPlusModel.FK__Docente__usuario__3B75D760" FromRole="Docente" ToRole="Usuarios" />
           <NavigationProperty Name="DocenteGradoMateria" Relationship="ITCAPlusModel.FK__DocenteGr__anio___5629CD9C" FromRole="Docente" ToRole="DocenteGradoMateria" />
           <NavigationProperty Name="DocenteMateria" Relationship="ITCAPlusModel.FK__DocenteMa__docen__52593CB8" FromRole="Docente" ToRole="DocenteMateria" />
+          <NavigationProperty Name="Usuarios" Relationship="ITCAPlusModel.FK__Docente__usuario__3B75D760" FromRole="Docente" ToRole="Usuarios" />
         </EntityType>
         <EntityType Name="DocenteGradoMateria">
           <Key>
@@ -779,18 +783,6 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
           <Property Name="anio_escolar" Type="Int32" />
           <NavigationProperty Name="Alumno" Relationship="ITCAPlusModel.FK__GradoAlum__anio___4E88ABD4" FromRole="GradoAlumno" ToRole="Alumno" />
           <NavigationProperty Name="Grado" Relationship="ITCAPlusModel.FK__GradoAlum__grado__4F7CD00D" FromRole="GradoAlumno" ToRole="Grado" />
-        </EntityType>
-        <EntityType Name="Materia">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Asistencia" Relationship="ITCAPlusModel.FK__Asistenci__mater__5BE2A6F2" FromRole="Materia" ToRole="Asistencia" />
-          <NavigationProperty Name="DocenteGradoMateria" Relationship="ITCAPlusModel.FK__DocenteGr__mater__571DF1D5" FromRole="Materia" ToRole="DocenteGradoMateria" />
-          <NavigationProperty Name="DocenteMateria" Relationship="ITCAPlusModel.FK__DocenteMa__mater__534D60F1" FromRole="Materia" ToRole="DocenteMateria" />
-          <NavigationProperty Name="Notas" Relationship="ITCAPlusModel.FK__Notas__materia_i__6754599E" FromRole="Materia" ToRole="Notas" />
-          <Property Name="estado" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="Notas">
           <Key>
@@ -845,24 +837,6 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
           <Property Name="telefono" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
           <Property Name="direccion" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="AlumnoResponsable" Relationship="ITCAPlusModel.FK__AlumnoRes__respo__4BAC3F29" FromRole="Responsable" ToRole="AlumnoResponsable" />
-        </EntityType>
-        <EntityType Name="Usuarios">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="tel" Type="String" MaxLength="9" FixedLength="false" Unicode="true" />
-          <Property Name="usuario" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="correo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="contrasena" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="restablecer" Type="Boolean" />
-          <Property Name="confirmar" Type="Boolean" />
-          <Property Name="Token" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="fotografia" Type="Binary" MaxLength="Max" FixedLength="false" />
-          <Property Name="rol" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Docente" Relationship="ITCAPlusModel.FK__Docente__usuario__3B75D760" FromRole="Usuarios" ToRole="Docente" />
-          <Property Name="estado" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="vw_AlumnosPorMateriaGrado">
           <Key>
@@ -922,6 +896,7 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
           <Property Name="Trimestre2" Type="Decimal" Precision="10" Scale="4" />
           <Property Name="Trimestre3" Type="Decimal" Precision="10" Scale="4" />
           <Property Name="PromedioFinal" Type="Decimal" Precision="38" Scale="6" />
+          <Property Name="docente_id" Type="Int32" />
         </EntityType>
         <EntityType Name="vw_NotasPorAlumno">
           <Key>
@@ -941,6 +916,7 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
           <Property Name="nota2" Type="Decimal" Precision="5" Scale="2" />
           <Property Name="nota3" Type="Decimal" Precision="5" Scale="2" />
           <Property Name="promedio" Type="Decimal" Precision="10" Scale="4" />
+          <Property Name="docente_id" Type="Int32" />
         </EntityType>
         <Association Name="FK__AlumnoRes__alumn__4AB81AF0">
           <End Type="ITCAPlusModel.Alumno" Role="Alumno" Multiplicity="0..1" />
@@ -1014,30 +990,6 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Asistenci__mater__5BE2A6F2">
-          <End Type="ITCAPlusModel.Materia" Role="Materia" Multiplicity="0..1" />
-          <End Type="ITCAPlusModel.Asistencia" Role="Asistencia" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Materia">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Asistencia">
-              <PropertyRef Name="materia_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Docente__usuario__3B75D760">
-          <End Type="ITCAPlusModel.Usuarios" Role="Usuarios" Multiplicity="0..1" />
-          <End Type="ITCAPlusModel.Docente" Role="Docente" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Usuarios">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Docente">
-              <PropertyRef Name="usuario_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK__DocenteGr__anio___5629CD9C">
           <End Type="ITCAPlusModel.Docente" Role="Docente" Multiplicity="0..1" />
           <End Type="ITCAPlusModel.DocenteGradoMateria" Role="DocenteGradoMateria" Multiplicity="*" />
@@ -1074,6 +1026,89 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__GradoAlum__grado__4F7CD00D">
+          <End Type="ITCAPlusModel.Grado" Role="Grado" Multiplicity="0..1" />
+          <End Type="ITCAPlusModel.GradoAlumno" Role="GradoAlumno" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Grado">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="GradoAlumno">
+              <PropertyRef Name="grado_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="vw_PerfilDocente">
+          <Key>
+            <PropertyRef Name="docente_id" />
+            <PropertyRef Name="usuario_id" />
+            <PropertyRef Name="estado" />
+          </Key>
+          <Property Name="docente_id" Type="Int32" Nullable="false" />
+          <Property Name="usuario_id" Type="Int32" Nullable="false" />
+          <Property Name="nombre_docente" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="telefono" Type="String" MaxLength="9" FixedLength="false" Unicode="true" />
+          <Property Name="carnet" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="correo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="estado" Type="Boolean" Nullable="false" />
+          <Property Name="rol" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="especialidad" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="fotografia" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="Materia">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="estado" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Asistencia" Relationship="ITCAPlusModel.FK__Asistenci__mater__5BE2A6F2" FromRole="Materia" ToRole="Asistencia" />
+          <NavigationProperty Name="DocenteGradoMateria" Relationship="ITCAPlusModel.FK__DocenteGr__mater__571DF1D5" FromRole="Materia" ToRole="DocenteGradoMateria" />
+          <NavigationProperty Name="DocenteMateria" Relationship="ITCAPlusModel.FK__DocenteMa__mater__534D60F1" FromRole="Materia" ToRole="DocenteMateria" />
+          <NavigationProperty Name="Notas" Relationship="ITCAPlusModel.FK__Notas__materia_i__6754599E" FromRole="Materia" ToRole="Notas" />
+        </EntityType>
+        <EntityType Name="Usuarios">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="tel" Type="String" MaxLength="9" FixedLength="false" Unicode="true" />
+          <Property Name="usuario" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="correo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="contrasena" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="restablecer" Type="Boolean" />
+          <Property Name="confirmar" Type="Boolean" />
+          <Property Name="Token" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="fotografia" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="rol" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="estado" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Docente" Relationship="ITCAPlusModel.FK__Docente__usuario__3B75D760" FromRole="Usuarios" ToRole="Docente" />
+        </EntityType>
+        <Association Name="FK__Asistenci__mater__5BE2A6F2">
+          <End Type="ITCAPlusModel.Materia" Role="Materia" Multiplicity="0..1" />
+          <End Type="ITCAPlusModel.Asistencia" Role="Asistencia" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Materia">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Asistencia">
+              <PropertyRef Name="materia_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Docente__usuario__3B75D760">
+          <End Type="ITCAPlusModel.Usuarios" Role="Usuarios" Multiplicity="0..1" />
+          <End Type="ITCAPlusModel.Docente" Role="Docente" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuarios">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Docente">
+              <PropertyRef Name="usuario_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__DocenteGr__mater__571DF1D5">
           <End Type="ITCAPlusModel.Materia" Role="Materia" Multiplicity="0..1" />
           <End Type="ITCAPlusModel.DocenteGradoMateria" Role="DocenteGradoMateria" Multiplicity="*" />
@@ -1098,18 +1133,6 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__GradoAlum__grado__4F7CD00D">
-          <End Type="ITCAPlusModel.Grado" Role="Grado" Multiplicity="0..1" />
-          <End Type="ITCAPlusModel.GradoAlumno" Role="GradoAlumno" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Grado">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="GradoAlumno">
-              <PropertyRef Name="grado_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK__Notas__materia_i__6754599E">
           <End Type="ITCAPlusModel.Materia" Role="Materia" Multiplicity="0..1" />
           <End Type="ITCAPlusModel.Notas" Role="Notas" Multiplicity="*" />
@@ -1122,23 +1145,6 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="vw_PerfilDocente">
-          <Key>
-            <PropertyRef Name="docente_id" />
-            <PropertyRef Name="usuario_id" />
-            <PropertyRef Name="estado" />
-          </Key>
-          <Property Name="docente_id" Type="Int32" Nullable="false" />
-          <Property Name="usuario_id" Type="Int32" Nullable="false" />
-          <Property Name="nombre_docente" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="telefono" Type="String" MaxLength="9" FixedLength="false" Unicode="true" />
-          <Property Name="carnet" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="correo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="estado" Type="Boolean" Nullable="false" />
-          <Property Name="rol" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
-          <Property Name="especialidad" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="fotografia" Type="Binary" MaxLength="Max" FixedLength="false" />
-        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1227,15 +1233,6 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Materia">
-            <EntityTypeMapping TypeName="ITCAPlusModel.Materia">
-              <MappingFragment StoreEntitySet="Materia">
-                <ScalarProperty Name="estado" ColumnName="estado" />
-                <ScalarProperty Name="nombre" ColumnName="nombre" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Notas">
             <EntityTypeMapping TypeName="ITCAPlusModel.Notas">
               <MappingFragment StoreEntitySet="Notas">
@@ -1291,24 +1288,6 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Usuarios">
-            <EntityTypeMapping TypeName="ITCAPlusModel.Usuarios">
-              <MappingFragment StoreEntitySet="Usuarios">
-                <ScalarProperty Name="estado" ColumnName="estado" />
-                <ScalarProperty Name="rol" ColumnName="rol" />
-                <ScalarProperty Name="fotografia" ColumnName="fotografia" />
-                <ScalarProperty Name="Token" ColumnName="Token" />
-                <ScalarProperty Name="confirmar" ColumnName="confirmar" />
-                <ScalarProperty Name="restablecer" ColumnName="restablecer" />
-                <ScalarProperty Name="contrasena" ColumnName="contrasena" />
-                <ScalarProperty Name="correo" ColumnName="correo" />
-                <ScalarProperty Name="usuario" ColumnName="usuario" />
-                <ScalarProperty Name="tel" ColumnName="tel" />
-                <ScalarProperty Name="nombre" ColumnName="nombre" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="vw_AlumnosPorMateriaGrado">
             <EntityTypeMapping TypeName="ITCAPlusModel.vw_AlumnosPorMateriaGrado">
               <MappingFragment StoreEntitySet="vw_AlumnosPorMateriaGrado">
@@ -1354,6 +1333,7 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
           <EntitySetMapping Name="vw_NotasAnualesPorAlumno">
             <EntityTypeMapping TypeName="ITCAPlusModel.vw_NotasAnualesPorAlumno">
               <MappingFragment StoreEntitySet="vw_NotasAnualesPorAlumno">
+                <ScalarProperty Name="docente_id" ColumnName="docente_id" />
                 <ScalarProperty Name="PromedioFinal" ColumnName="PromedioFinal" />
                 <ScalarProperty Name="Trimestre3" ColumnName="Trimestre3" />
                 <ScalarProperty Name="Trimestre2" ColumnName="Trimestre2" />
@@ -1370,6 +1350,7 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
           <EntitySetMapping Name="vw_NotasPorAlumno">
             <EntityTypeMapping TypeName="ITCAPlusModel.vw_NotasPorAlumno">
               <MappingFragment StoreEntitySet="vw_NotasPorAlumno">
+                <ScalarProperty Name="docente_id" ColumnName="docente_id" />
                 <ScalarProperty Name="promedio" ColumnName="promedio" />
                 <ScalarProperty Name="nota3" ColumnName="nota3" />
                 <ScalarProperty Name="nota2" ColumnName="nota2" />
@@ -1398,6 +1379,33 @@ advertencia 6002: La tabla o vista 'ITCAPlus.dbo.vw_PerfilDocente' no tiene defi
                 <ScalarProperty Name="nombre_docente" ColumnName="nombre_docente" />
                 <ScalarProperty Name="usuario_id" ColumnName="usuario_id" />
                 <ScalarProperty Name="docente_id" ColumnName="docente_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Materia">
+            <EntityTypeMapping TypeName="ITCAPlusModel.Materia">
+              <MappingFragment StoreEntitySet="Materia">
+                <ScalarProperty Name="estado" ColumnName="estado" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Usuarios">
+            <EntityTypeMapping TypeName="ITCAPlusModel.Usuarios">
+              <MappingFragment StoreEntitySet="Usuarios">
+                <ScalarProperty Name="estado" ColumnName="estado" />
+                <ScalarProperty Name="rol" ColumnName="rol" />
+                <ScalarProperty Name="fotografia" ColumnName="fotografia" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+                <ScalarProperty Name="confirmar" ColumnName="confirmar" />
+                <ScalarProperty Name="restablecer" ColumnName="restablecer" />
+                <ScalarProperty Name="contrasena" ColumnName="contrasena" />
+                <ScalarProperty Name="correo" ColumnName="correo" />
+                <ScalarProperty Name="usuario" ColumnName="usuario" />
+                <ScalarProperty Name="tel" ColumnName="tel" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
