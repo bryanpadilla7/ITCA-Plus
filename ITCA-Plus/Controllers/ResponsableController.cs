@@ -57,6 +57,7 @@ namespace ITCA_Plus.Controllers
 
                     context.AlumnoResponsable.Add(alumnoResponsable);
                     context.SaveChanges();
+                    HelperNotify.Notificar(this, "Responsable agregado correctamente", "success");
                 }
 
                 return RedirectToAction("Alumnos", "Alumno");
@@ -126,6 +127,7 @@ namespace ITCA_Plus.Controllers
                     responsable.telefono = model.telefono;
                     responsable.direccion = model.direccion;
                     contexto.SaveChanges();
+                    HelperNotify.Notificar(this, "Responsable modificado correctamente", "success");
                 }
             }
             return RedirectToAction("Alumnos", "Alumno");

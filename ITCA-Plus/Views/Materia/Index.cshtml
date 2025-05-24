@@ -1,0 +1,92 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cliente = Session["cuenta"] as ITCA_Plus.Models.Usuarios;
+}
+
+<script>
+    $(document).ready(function () {
+        var docenteId = @cliente.id;
+        // Obtener grados donde el docente tiene materias asignadas
+        $.ajax({
+            url: '/Materia/GetGradosPorDocente',
+            data: { docenteId: docenteId },
+            method: 'GET',
+            success: function (grados) {
+                if (grados.length === 0) {
+                    $('#accordionGrados').html('<p>No tienes grados asignados.</p>');
+                    return;
+                }
+
+                grados.forEach((grado, index) => {
+                    const gradoId = grado.id;
+                    const collapseId = `collapseGrado${gradoId}`;
+
+                    const item = `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading${gradoId}">
+                            <button  class="accordion-button collapsed" style="background-color: #435D7D; color: white;" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
+                                <strong>${grado.nombre} ${grado.seccion}</strong>
+                            </button>
+                        </h2>
+                        <div id="${collapseId}" class="accordion-collapse collapse" data-bs-parent="#accordionGrados">
+                            <div class="accordion-body">
+                                <div id="materiasGrado${gradoId}" class="list-group">
+                                    <div class="text-muted">Cargando materias...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+
+                    $('#accordionGrados').append(item);
+
+                    // Cargar materias cuando se despliegue el acordeón
+                    $(`#${collapseId}`).on('show.bs.collapse', function () {
+                        cargarMaterias(gradoId, docenteId, grado.nombre, grado.seccion);
+                    });
+                });
+            }
+        });
+
+        function cargarMaterias(gradoId, docenteId, gradoNombre, gradoSeccion) {
+            const contenedor = $(`#materiasGrado${gradoId}`);
+            contenedor.html('<div class="text-muted">Cargando materias...</div>');
+
+            $.ajax({
+                url: '/Materia/GetMateriasDelDocenteEnGrado',
+                data: { gradoId, docenteId },
+                method: 'GET',
+                success: function (materias) {
+                    if (!materias.length) {
+                        contenedor.html('<div class="text-danger">No tienes materias asignadas en este grado.</div>');
+                        return;
+                    }
+                    contenedor.empty();
+                    materias.forEach(m => {
+                        const url = `/Materia/ListaFechasAsistencia?` +
+                            `gradoId=${gradoId}` +
+                            `&materiaId=${m.materia_id}` +
+                            `&grado=${encodeURIComponent(gradoNombre)}` +
+                            `&seccion=${encodeURIComponent(gradoSeccion)}` +
+                            `&nombreMateria=${encodeURIComponent(m.materia_nombre)}`;
+                        contenedor.append(`
+                  <a href="${url}"
+                     class="list-group-item list-group-item-action"
+                     style="color: #435D7D">
+                    ${m.materia_nombre}
+                  </a>`);
+                    });
+                }
+            });
+        }
+    });
+</script>
+
+<h2>Grados asignados</h2>
+
+<div class="accordion" id="accordionGrados">
+    <!-- Acordeones se llenarán por JS -->
+</div>
+
+

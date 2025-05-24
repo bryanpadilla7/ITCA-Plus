@@ -344,6 +344,8 @@
     <Content Include="Views\Reporte\ReporteUsuarios.cshtml" />
     <Content Include="Views\Reporte\ReporteGrados.cshtml" />
     <Content Include="Views\Reporte\ReporteMaterias.cshtml" />
+    <Content Include="Views\Materia\Index.cshtml" />
+    <Content Include="Views\Materia\ListaFechasAsistencia.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

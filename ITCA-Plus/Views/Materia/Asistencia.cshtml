@@ -1,10 +1,14 @@
-﻿
+﻿@model List<ITCA_Plus.Models.Alumno>
 @{
     ViewBag.Title = "Asistencia";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var cliente = Session["cuenta"] as ITCA_Plus.Models.Usuarios;
+
+    var existe = (bool)ViewBag.ExisteAsistencia;
+    var accion = existe ? "ActualizarAsistencia" : "GuardarAsistencia";
 }
 
-<div class="card">
+<div class="card mb-4">
     <div class="row g-0">
         <div class="col-md-4">
             <img src="https://editorescientificos.cl/wp-content/uploads/2023/05/Cuales-son-los-niveles-de-educacion-en-Chile.jpg"
@@ -16,14 +20,14 @@
                 <h5 class="card-title" style="color: #435D7D;">Listado de asistencia</h5>
                 <div class="row">
                     <div class="col-md-6">
-                        <p class="card-text"><strong>Materia:</strong></p>
-                        <p class="card-text"><strong>Fecha:</strong></p>
-                        <p class="card-text"><strong>Docente:</strong></p>
+                        <p class="card-text"><strong>Materia:</strong> @ViewBag.Materia</p>
+                        <p class="card-text"><strong>Fecha:</strong>   @ViewBag.Fecha</p>
+                        <p class="card-text"><strong>Docente:</strong> @cliente.nombre</p>
                     </div>
                     <div class="col-md-6">
-                        <p class="card-text"><strong>Grado:</strong></p>
-                        <p class="card-text"><strong>Sección:</strong></p>
-                        <p class="card-text"><strong>Horario:</strong></p>
+                        <p class="card-text"><strong>Grado:</strong>    @ViewBag.Grado</p>
+                        <p class="card-text"><strong>Sección:</strong>  @ViewBag.Seccion</p>
+                        <p class="card-text"><strong>Horario:</strong>  @ViewBag.Horario</p>
                     </div>
                 </div>
             </div>
@@ -31,34 +35,92 @@
     </div>
 </div>
 
-<div class="card mt-4">
-    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #435D7D;">
-        <h5 class="mb-0 text-white">Lista de asistencia</h5>
-    </div>
+@using (Html.BeginForm(accion, "Materia", FormMethod.Post))
+{
+    @Html.Hidden("materiaId", (int)ViewBag.MateriaId)
+    @Html.Hidden("fecha", ((DateTime)ViewBag.FechaRaw).ToString("yyyy-MM-dd"))
+    @Html.Hidden("gradoId", (int)ViewBag.GradoId)
+    @Html.Hidden("seccion", (string)ViewBag.Seccion)
 
-    <div class="card-body">
-        <table class="table">
-            <thead>
-                <tr style="color: #435D7D;">
-                    <th>Carnet</th>
-                    <th>Nombre alumno</th>
-                    <th>Asistio</th>
-                    <th>Falta</th>
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    foreach (ITCA_Plus.Models.Alumno item in ViewBag.alumnos)
-                    {
-                        <tr>
-                            <td>@item.carnet</td>
-                            <td>@item.nombre</td>
-                            <td><input type="radio" /></td>
-                            <td><input type="radio" /></td>
-                        </tr>
-                    }
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #435D7D;">
+            <h5 class="mb-0 text-white">Asistencia de Alumnos</h5>
+
+            @{
+                var lista = (List<ITCA_Plus.Models.Alumno>)ViewBag.alumnos;
+                if (lista != null && lista.Any())
+                {
+                        <div class="btn-group" role="group">
+                            <button type="button"
+                                    id="btn-marcar-todos"
+                                    class="btn btn-primary"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Marcar todos Asistieron">
+                                <i class="fa-solid fa-check-double"></i>
+                            </button>
+                            <button type="submit"
+                                    class="btn btn-success"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Guardar lista">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                            </button>
+                        </div>
                 }
-            </tbody>
-        </table>
+            }
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr style="color: #435D7D;">
+                        <th>Carnet</th>
+                        <th>Nombre alumno</th>
+                        <th>Asistió</th>
+                        <th>Falta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (lista == null || !lista.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    Aún no se han inscrito alumnos para esta materia en este grado.
+                                </td>
+                            </tr>
+                            ;
+                        }
+                        else
+                        {
+                            foreach (var alumno in lista)
+                            {
+                                <tr>
+                                    <td>@alumno.carnet</td>
+                                    <td>@alumno.nombre</td>
+                                   
+                                    <td><input type="radio" name="asistencia[@alumno.id]" value="1" /></td>
+                                    <td><input type="radio" name="asistencia[@alumno.id]" value="0" /></td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+}
+
+<script>
+    document.getElementById('btn-marcar-todos').addEventListener('click', function () {
+        const radiosAsistio = document.querySelectorAll('input[type="radio"][value="1"]');
+        radiosAsistio.forEach(radio => {
+            radio.checked = true;
+        });
+    });
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
