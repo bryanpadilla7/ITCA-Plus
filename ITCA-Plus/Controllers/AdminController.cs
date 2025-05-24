@@ -22,7 +22,7 @@ namespace ITCA_Plus.Controllers
         [HttpGet]
         public ActionResult GetMaterias()
         {
-            var materias = db.Materia
+            var materias = db.Materia.Where(x => x.estado == true)
                 .Select(m => new {
                     m.id,
                     m.nombre
@@ -141,6 +141,7 @@ namespace ITCA_Plus.Controllers
 
             usuario.confirmar = false;
             usuario.restablecer = false;
+            usuario.estado = true;
             usuario.rol = "Docente";
             db.Usuarios.Add(usuario);
             db.SaveChanges();
@@ -260,7 +261,9 @@ namespace ITCA_Plus.Controllers
             if (string.IsNullOrWhiteSpace(materia.nombre))
                 return Json(new { success = false, message = "El nombre es obligatorio." });
 
+            materia.estado = true;
             db.Materia.Add(materia);
+            
             db.SaveChanges();
 
             return Json(new { success = true, message = "Materia registrada correctamente." });

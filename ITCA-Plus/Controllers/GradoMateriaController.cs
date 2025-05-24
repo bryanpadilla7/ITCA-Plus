@@ -87,6 +87,8 @@ namespace ITCA_Plus.Controllers
                 return Json(new { success = false, message = "Grado no encontrado" });
         }
 
+
+        //logica de las materias docente alumno
         public ActionResult Asignar()
         {
             return View();
@@ -152,12 +154,14 @@ namespace ITCA_Plus.Controllers
                             {
                                 m.materia_id,
                                 m.materia_nombre,
-                                docente_nombre = m.docente_nombre,
-                                carnet = u.usuario  // o el campo que represente el carnet
+                                m.docente_nombre,
+                                carnet = u.usuario, // o el campo que represente el carnet
+                                m.docente_id
                             }).ToList();
 
             return Json(materias, JsonRequestBehavior.AllowGet);
         }
+
 
         [HttpPost]
         public JsonResult AsignarMateria(int gradoId, int materiaId, int docenteId)
@@ -191,6 +195,39 @@ namespace ITCA_Plus.Controllers
             return Json(new { success = true, message = "Materia asignada correctamente." });
         }
 
+
+        [HttpGet]
+        public JsonResult GetDocentesPorMateria(string nombreMateria)
+        {
+            var docentes = db.vw_PerfilDocente
+                .Where(d => d.especialidad == nombreMateria && d.estado == true)
+                .Select(d => new
+                {
+                    d.docente_id,
+                    nombre = d.nombre_docente,
+                })
+                .ToList();
+
+            return Json(docentes, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult ActualizarAsignacion(int gradoId, int materiaId, int docenteId)
+        {
+            var asignacion = db.DocenteGradoMateria.FirstOrDefault(x => x.grado_id == gradoId && x.materia_id == materiaId);
+
+            if (asignacion == null)
+            {
+                return Json(new { success = false, message = "Asignación no encontrada." });
+            }
+
+            asignacion.docente_id = docenteId;
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Asignación actualizada correctamente." });
+        }
+
+
         //alumnos logica
 
         [HttpGet]
@@ -215,20 +252,16 @@ namespace ITCA_Plus.Controllers
         [HttpGet]
         public JsonResult GetAlumnosDisponibles(int gradoId)
         {
-            var grado = db.Grado.FirstOrDefault(g => g.id == gradoId);
-            if (grado == null)
-            {
-                return Json(new { success = false, message = "Grado no encontrado." }, JsonRequestBehavior.AllowGet);
-            }
+            int anioActual = DateTime.Now.Year;
 
-            // Obtener IDs de alumnos asignados a cualquier grado con el mismo nombre (nivel)
+            // Obtener los IDs de los alumnos ya asignados a cualquier grado en el año actual
             var idsAsignados = db.GradoAlumno
-                .Where(ga => ga.Grado.nombre == grado.nombre)
+                .Where(ga => ga.anio_escolar == anioActual)
                 .Select(ga => ga.alumno_id)
                 .Distinct()
                 .ToList();
 
-            // Traer todos los alumnos que NO estén en la lista anterior
+            // Traer solo los alumnos que no estén asignados en este año
             var disponibles = db.Alumno
                 .Where(a => !idsAsignados.Contains(a.id))
                 .Select(a => new
@@ -240,8 +273,6 @@ namespace ITCA_Plus.Controllers
 
             return Json(disponibles, JsonRequestBehavior.AllowGet);
         }
-
-
 
 
         [HttpPost]
@@ -265,6 +296,27 @@ namespace ITCA_Plus.Controllers
             db.SaveChanges();
 
             return Json(new { success = true, message = "Alumno asignado correctamente." });
+        }
+        [HttpPost]
+        public JsonResult EliminarAlumnoDelGrado(int alumnoId, int gradoId)
+        {
+            var anioActual = DateTime.Now.Year;
+
+            var asignacion = db.GradoAlumno.FirstOrDefault(ga =>
+                ga.alumno_id == alumnoId &&
+                ga.grado_id == gradoId &&
+                ga.anio_escolar == anioActual
+            );
+
+            if (asignacion == null)
+            {
+                return Json(new { success = false, message = "Asignación no encontrada." });
+            }
+
+            db.GradoAlumno.Remove(asignacion);
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Alumno eliminado del grado." });
         }
 
 

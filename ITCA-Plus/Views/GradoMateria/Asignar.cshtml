@@ -7,6 +7,21 @@
 
 <script>
     $(document).ready(function () {
+
+
+
+        $('#btnActualizar').hide();
+        $('#btnCancelar').hide();
+
+        document.querySelector('#btnCancelar').addEventListener('click', function () {
+            $('#btnActualizar').hide();
+            $('#btnAsignarMateria').show();
+            $('#btnCancelar').hide();
+            $('#materiaSelect').val('');
+            $('#docenteSelect').val('');
+            $('#docenteContainer').hide();
+        });
+
         const gradoId = getParameterByName('id'); // si llega como query param
         cargarMateriasAsignadas(gradoId);
         cargarDatos(gradoId)
@@ -38,9 +53,13 @@
              });
         }
 
-        $('#materiaSelect').on('change', function () {
-            const materiaId = $(this).val();
 
+        $('#materiaSelect').on('change', function () {
+            $('#btnAsignarMateria').show();
+            $('#btnActualizar').hide();
+            $('#btnCancelar').hide();
+
+            const materiaId = $(this).val();
             if (materiaId) {
                 $.ajax({
                     url: '/GradoMateria/GetDocentesPorEspecialidad',
@@ -85,7 +104,11 @@
                             <td>${m.materia_nombre}</td>
                             <td>${m.docente_nombre}</td>
                             <td>${m.carnet}</td>
-                            <td>Acciones</td>
+                            <td>
+                                <a href="#" class="ms-4" onclick="cargarUpdate('${m.materia_id}', '${m.docente_id}', '${m.materia_nombre}')" title="Editar">
+                                    <i class="fa-solid fa-pen fa-lg text-warning"></i>
+                                </a>
+                            </td>
                         </tr>
                     `);
                         });
@@ -98,27 +121,6 @@
                 }
             });
         }
-
-        $('#selectMateria').on('change', function () {
-            const materiaId = $(this).val();
-
-            if (materiaId) {
-                $.ajax({
-                    url: '/Docente/GetByEspecialidad',
-                    type: 'GET',
-                    data: { especialidadId: materiaId },
-                    success: function (data) {
-                        $('#selectDocente').empty().append('<option value="">Seleccione un docente</option>');
-                        data.forEach(doc => {
-                            $('#selectDocente').append(`<option value="${doc.id}">${doc.nombre}</option>`);
-                        });
-                        $('#selectDocente').removeClass('d-none');
-                    }
-                });
-            } else {
-                $('#selectDocente').addClass('d-none').empty().append('<option value="">Seleccione un docente</option>');
-            }
-        });
 
         $('#btnAsignarMateria').on('click', function () {
             const materiaId = $('#materiaSelect').val();
@@ -170,6 +172,41 @@
             });
         });
 
+
+        $('#btnActualizar').click(function () {
+            const materiaId = $('#materiaSelect').val();
+            const docenteId = $('#docenteSelect').val();
+
+            if (!docenteId) {
+                toastr.warning('Seleccione un docente.', 'Advertencia');
+                return;
+            }
+
+            $.ajax({
+                url: '/GradoMateria/ActualizarAsignacion',
+                type: 'POST',
+                data: {
+                    gradoId: gradoId,
+                    materiaId: materiaId,
+                    docenteId: docenteId
+                },
+                success: function (res) {
+                    if (res.success) {
+                        toastr.success(res.message, 'Actualizado');
+                        cargarMateriasAsignadas(gradoId);
+                        $('#btnCancelar').click();
+                    } else {
+                        toastr.error(res.message, 'Error');
+                    }
+                },
+                error: function () {
+                    toastr.error('No se pudo actualizar la asignación.', 'Error');
+                }
+            });
+        });
+
+
+
         cargarAlumnosDisponibles(gradoId);
 
         function cargarAlumnosDisponibles() {
@@ -205,22 +242,26 @@
 
                     if (data.length === 0) {
                         $('#tablaAlumnos').append(`
-                            <tr>
-                                <td colspan="4" class="text-center">No hay alumnos asignados.</td>
-                            </tr>
-                        `);
+                    <tr>
+                        <td colspan="4" class="text-center">No hay alumnos asignados.</td>
+                    </tr>
+                `);
                         return;
                     }
 
                     data.forEach((alumno, index) => {
                         $('#tablaAlumnos').append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${alumno.nombre}</td>
-                                <td>${alumno.carnet}</td>
-                                <td>acciones</td>
-                            </tr>
-                        `);
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${alumno.nombre}</td>
+                        <td>${alumno.carnet}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="eliminarAlumnoDeGrado(${alumno.id}, ${gradoId})">
+                                <i class="fa-solid fa-trash"></i> Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                `);
                     });
                 },
                 error: function () {
@@ -232,6 +273,9 @@
                 }
             });
         }
+
+
+        
 
 
         $('#btnAsignarAlumno').on('click', function () {
@@ -280,10 +324,83 @@
             });
         });
 
+
+        window.eliminarAlumnoDeGrado = function eliminarAlumnoDeGrado(alumnoId, gradoId) {
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: 'El alumno será eliminado del grado.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/GradoMateria/EliminarAlumnoDelGrado',
+                        type: 'POST',
+                        data: {
+                            alumnoId: alumnoId,
+                            gradoId: gradoId
+                        },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire('Eliminado', res.message, 'success');
+                                cargarAlumnosAsignados(gradoId);
+                                cargarAlumnosDisponibles(gradoId);
+                            } else {
+                                Swal.fire('Error', res.message, 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('Error', 'No se pudo eliminar el alumno.', 'error');
+                        }
+                    });
+                }
+            });
+        }
         //fin de ajax
     });
 
+    
 
+
+    function cargarUpdate(materiaId, docenteId, nombreMateria) {
+        // Establecer la materia seleccionada
+        $('#materiaSelect').val(materiaId);
+        $('#docenteContainer').hide();
+        $('#btnActualizar').show();
+        $('#btnAsignarMateria').hide();
+        $('#btnCancelar').show();
+
+        // Cargar docentes de la materia seleccionada
+        $.ajax({
+            url: '/GradoMateria/GetDocentesPorMateria', // Asegúrate de tener este controlador
+            type: 'GET',
+            data: { nombreMateria: nombreMateria },
+            success: function (docentes) {
+                const selectDocente = $('#docenteSelect');
+                selectDocente.empty();
+                selectDocente.append('<option value="">Seleccione un docente</option>');
+
+                docentes.forEach(d => {
+                    const selected = d.docente_id === parseInt(docenteId) ? 'selected' : '';
+                    selectDocente.append(`<option value="${d.docente_id}" ${selected}>${d.nombre}</option>`);
+                });
+
+                // Mostrar el select ya cargado
+
+                $('#docenteContainer').show();
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudieron cargar los docentes.'
+                });
+            }
+        });
+    }
 
 
     // Utilidad para obtener parámetros de la URL
@@ -340,7 +457,10 @@
             </div>
 
 
-            <button class="btn btn-primary mb-3" id="btnAsignarMateria">Asignar Materia</button>
+            <button class="btn btn-success mb-3" id="btnAsignarMateria">Asignar Materia</button>
+            <button class="btn btn-primary mb-3" id="btnActualizar">Actualizar Materia</button>
+            <button class="btn btn-secondary mb-3" id="btnCancelar">Cancelar</button>
+
 
             <table class="table table-bordered">
                 <thead>
