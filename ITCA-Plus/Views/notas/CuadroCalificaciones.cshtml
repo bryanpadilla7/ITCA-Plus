@@ -227,20 +227,20 @@
 <!--Card que muestra los datos filtrados-->
 <div class="container d-flex justify-content-center align-items-center mt-5">
     <div class="card" style="width: 800px;">
-        <h5 class="card-header text-center" style="background-color: #aeb6bf;">Resultados de la búsqueda</h5>
+        <h5 class="card-header text-center text-white" style="background-color: #435D7D;">Resultados de la búsqueda</h5>
         <div class="card-body">
             @if (ViewBag.ListadoPorMateriaGrado != null && Listado.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table table-striped table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <td>Carnet</td>
-                                <td>Nombre Alumno</td>
-                                <td>Notas 1° Trimestre</td>
-                                <td>Notas 2° Trimestre</td>
-                                <td>Notas 3° Trimestre</td>
-                                <td>Acciones</td>
+                    <table class="table">
+                        <thead >
+                            <tr style="color: #435D7D;">
+                                <td  class="fw-bold">Carnet</td>
+                                <td  class="fw-bold">Nombre Alumno</td>
+                                <td  class="fw-bold">Notas 1° Trimestre</td>
+                                <td  class="fw-bold">Notas 2° Trimestre</td>
+                                <td  class="fw-bold">Notas 3° Trimestre</td>
+                                <td  class="fw-bold">Acciones</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -299,12 +299,12 @@
                                         }
                                         @if (cliente.rol != "Admin")
                                         {
-                                            <td>
+                                            <td class="text-center">
 
                                                 <a href="@Url.Action("EditarNotas","notas", new { idMateria = item.materia_id, nombreMateria = item.materia,
                                                                        idDoc= item.docente_id,
-                                                                   idAlum= item.alumno_id, nombreAlum = item.alumno})" class="btn btn-primary btn-sm">
-                                                    <i class="fa-solid fa-user-pen"></i> Editar
+                                                                   idAlum= item.alumno_id, nombreAlum = item.alumno})" title="Editar">
+                                                    <i class="fa-solid fa-pen fa-lg text-warning"></i> 
                                                 </a>
                                             </td>
                                         }
@@ -329,18 +329,18 @@
 <div class="modal fade" id="AgregarNotasModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header d-flex justify-content-between align-items-center" style="background-color: #435D7D;">
                 <h5 class="modal-title" id="exampleModalLabel">Notas Periodo</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <table class="table">
                     <thead>
-                        <tr>
-                            <td class="scope">Periodo</td>
-                            <td>Notas 1°</td>
-                            <td>Notas 2°</td>
-                            <td>Notas 3°</td>
+                        <tr style="color: #435D7D;">
+                            <td class="scope fw-bold">Periodo</td>
+                            <td class="fw-bold">Notas 1°</td>
+                            <td class="fw-bold">Notas 2°</td>
+                            <td class="fw-bold">Notas 3°</td>
                         </tr>
                     </thead>
                     <tbody>

@@ -68,21 +68,21 @@
 
 <div class="container d-flex justify-content-center align-items-center mt-5">
     <div class="card" style="width: 800px;">
-        <h5 class="card-header text-center" style="background-color: #aeb6bf;">Resultados de la búsqueda</h5>
+        <h5 class="card-header text-center text-white"  style="background-color: #435D7D;" >Resultados de la búsqueda</h5>
         <div class="card-body">
             @if (ViewBag.listado != null && Listado.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table table-striped table-bordered table-hover">
+                    <table class="table">
                         <thead>
-                            <tr>
-                                <td>Carnet</td>
-                                <td>Nombre Alumno</td>
-                                <td>Materia</td>
-                                <td>Trimestre 1</td>
-                                <td>Trimestre 2</td>
-                                <td>Trimestre 3</td>
-                                <td>Promedio Final</td>
+                            <tr style="color: #435D7D;">
+                                <td class="fw-bold">Carnet</td>
+                                <td class="fw-bold">Nombre Alumno</td>
+                                <td class="fw-bold">Materia</td>
+                                <td class="fw-bold">Trimestre 1</td>
+                                <td class="fw-bold">Trimestre 2</td>
+                                <td class="fw-bold">Trimestre 3</td>
+                                <td class="fw-bold">Promedio Final</td>
                             </tr>
                         </thead>
                         <tbody>

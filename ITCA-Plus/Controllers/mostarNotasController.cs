@@ -146,31 +146,38 @@ namespace ITCA_Plus.Controllers
         }
         public ActionResult reportesEspeciales()
         {
-            //cmbGrado
-            ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente
+            if (UsuarioActual != null)
+            {
+                //cmbGrado
+                ViewBag.cmbGrado = contexto.vw_MateriasAsignadasDocente
                 .Select(x => new SelectListItem
                 {
                     Text = x.grado_nombre,
                     Value = x.grado_nombre.ToString()
                 }).Distinct()
                 .ToList();
-            
-           int startYear = 2024;
-            int currentYear = DateTime.Now.Year;
-            // Genera una lista desde el 2024 hasta el año inmediatamente anterior al actual
-            var anios = Enumerable.Range(startYear, currentYear - startYear + 1)
-                      .OrderByDescending(y => y)
-                      .Select(y => new SelectListItem
-                      {
-                          Text = y.ToString(),
-                          Value = y.ToString()
-                      })
-                      .ToList();
 
-            // Asignamos la lista al ViewBag
-            ViewBag.cmbAnioReportes = anios;
-            ViewBag.listadoter = ViewBag.listado;
-            return View();
+                int startYear = 2024;
+                int currentYear = DateTime.Now.Year;
+                // Genera una lista desde el 2024 hasta el año inmediatamente anterior al actual
+                var anios = Enumerable.Range(startYear, currentYear - startYear + 1)
+                          .OrderByDescending(y => y)
+                          .Select(y => new SelectListItem
+                          {
+                              Text = y.ToString(),
+                              Value = y.ToString()
+                          })
+                          .ToList();
+
+                // Asignamos la lista al ViewBag
+                ViewBag.cmbAnioReportes = anios;
+                ViewBag.listadoter = ViewBag.listado;
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
         }
         [HttpPost]
         public ActionResult reportesEspeciales(string grado, string materia=null, int año=2025)

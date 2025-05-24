@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewBag.Title = "CambiosEdicion";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var Listado = ViewBag.ListadoPeticionesEdicion as List<ITCA_Plus.Models.notiCambioNota>;
+}
+
+<h2>Cambios Edicion</h2>
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="card" style="width: 800px;">
+        <h5 class="card-header text-center text-white" style="background-color: #435D7D;">Solicitudes de edición</h5>
+        <div class="card-body">
+            @if (ViewBag.ListadoPeticionesEdicion != null && Listado.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr style="color: #435D7D;">
+                                <td class="fw-bold">Id Edicion</td>
+                                <td class="fw-bold">Maestro solicitante</td>
+                                <td class="fw-bold">Periodo</td>
+                                <td class="fw-bold">Alumno</td>
+                                <td class="fw-bold">Materia</td>
+                                <td class="fw-bold">Acciones</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (ITCA_Plus.Models.notiCambioNota item in Listado)
+                                {
+                                    <tr>
+                                        <td class="scope">@item.id</td>
+                                        <td>@item.nombre_docente</td>
+                                        <td>@item.trimestres</td>
+                                        <td>@item.nombre_alumno</td>
+                                        <td>@item.nombre_materia</td>
+                                        <td class="text-center">
+                                            @using (Html.BeginForm("CambiosEdicion", "Edition", FormMethod.Post))
+                                            {
+                                                @Html.Hidden("id", item.id)
+                                                <button type="submit" class="btn btn-link p-0" onclick="return confirm('¿Permitir edición?');" title="Permitir edición">
+                                                    <i class="fa-solid fa-square-check fa-lg text-success"></i>
+                                                </button>
+                                            }
+
+                                        </td>
+                                    </tr>
+                                
+                            }
+                            }
+                        </tbody>
+                            </table>
+                        </div>
+                                }
+                    </div>
+    </div>
+    </div>
