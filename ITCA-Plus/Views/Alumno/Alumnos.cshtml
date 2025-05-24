@@ -78,8 +78,22 @@
         event.preventDefault();
         const form = event.target.form;
 
+        const fechaNacimiento = document.getElementById("txtFechaNacimiento").value;
+        const fechaNacimientoDate = new Date(fechaNacimiento);
+        const hoy = new Date();
+        const validarFecha = new Date(hoy.getFullYear() - 4, hoy.getMonth(), hoy.getDate());
+
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
+            return;
+        }
+
+        if (fechaNacimientoDate > validarFecha) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Fecha invalida',
+                text: 'El alumno debe tener al menos 4 años de edad',
+            });
             return;
         }
 
@@ -108,8 +122,22 @@
         event.preventDefault();
         const form = event.target.form;
 
+        const fechaNacimiento = document.getElementById("txtFechaNacimiento").value;
+        const fechaNacimientoDate = new Date(fechaNacimiento);
+        const hoy = new Date();
+        const validarFecha = new Date(hoy.getFullYear() - 4, hoy.getMonth(), hoy.getDate());
+
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
+            return;
+        }
+
+        if (fechaNacimientoDate > validarFecha) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Fecha invalida',
+                text: 'El alumno debe tener al menos 4 años de edad',
+            });
             return;
         }
 
@@ -206,30 +234,37 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     @Html.Label("Carnet")
-                                    @Html.TextBox("carnet_mostrado", Model?.carnet, new { @class = "form-control", disabled = "disabled" ,style = "max-width: none;", id = "txtCarnet_visible" })
-                                    @Html.HiddenFor(a => a.carnet, new { id="txtCarnet" })
+                                    <div class="input-group">
+                                        <span class="input-group-text rounded-start"><i class="bi bi-person-badge"></i></span>
+                                        @Html.TextBox("carnet_mostrado", Model?.carnet, new { @class = "form-control rounded-end", disabled = "disabled", style = "max-width: none;", id = "txtCarnet_visible" })
+                                        @Html.HiddenFor(a => a.carnet, new { id = "txtCarnet" })
+                                    </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     @Html.Label("Nombre alumno")
-                                    @Html.TextBoxFor(a => a.nombre, new { @class = "form-control", style = "max-width: none;", id = "txtNombre", required = "required" })
-                                    <div class="valid-feedback">Datos validos.</div>
-                                    <div class="invalid-feedback">Este campo es obligatorio.</div>
+                                    <div class="input-group">
+                                        <span class="input-group-text rounded-start"><i class="bi bi-person-fill"></i></span>
+                                        @Html.TextBoxFor(a => a.nombre, new { @class = "form-control rounded-end", style = "max-width: none;", id = "txtNombre", required = "required" })
+                                        <div class="valid-feedback">Datos validos.</div>
+                                        <div class="invalid-feedback">Este campo es obligatorio.</div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Nueva fila para fecha de nacimiento y género -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     @Html.Label("Fecha de nacimiento")
-                                    @Html.TextBoxFor(a => a.fecha_nacimiento, new { @class = "form-control", type = "date", style = "max-width: none;", id = "txtFechaNacimiento", required = "required" })
-                                    <div class="valid-feedback">Datos validos.</div>
-                                    <div class="invalid-feedback">Este campo es obligatorio.</div>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-calendar-check"></i></span>
+                                        @Html.TextBoxFor(a => a.fecha_nacimiento, new { @class = "form-control", type = "date", style = "max-width: none;", id = "txtFechaNacimiento", required = "required" })
+                                    </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     @Html.Label("Género")
-                                    @Html.DropDownListFor(a => a.genero, (IEnumerable<SelectListItem>)ViewBag.cmbGenero, new { @class = "form-control", style = "max-width: none;", id = "txtGenero" })
-                                    <div class="valid-feedback">Datos validos.</div>
-                                    <div class="invalid-feedback">Este campo es obligatorio.</div>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-gender-ambiguous"></i></span>
+                                        @Html.DropDownListFor(a => a.genero, (IEnumerable<SelectListItem>)ViewBag.cmbGenero, new { @class = "form-control", style = "max-width: none;", id = "txtGenero" })
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -265,7 +300,7 @@
         </div>
 
         <div class="card-body">
-            <table class="table">
+            <table class="table table-striped">
                 <thead>
                     <tr style="color: #435D7D;">
                         <th>Carnet</th>
@@ -293,7 +328,7 @@
                                            data-toggle="tooltip"
                                            data-placement="top"
                                            title="Agrega responsable">
-                                            <i class="fa-solid fa-user-shield fa-lg text-info"></i>
+                                            <i class="fa-solid fa-user-check fa-lg text-info"></i>
                                         </a>
                                     }
                                     else if (((List<int>)ViewBag.tieneResponsable).Contains(item.id))
@@ -304,7 +339,7 @@
                                            data-toggle="tooltip"
                                            data-placement="top"
                                            title="Editar responsable">
-                                            <i class="fa-solid fa-rotate fa-lg text-primary"></i>
+                                            <i class="fa-solid fa-user-pen fa-lg text-warning"></i>
                                         </a>
                                     }
                                     <a href=""
@@ -369,16 +404,6 @@
             } else {
                 nombre.classList.remove("is-valid");
                 nombre.classList.add("is-invalid");
-            }
-        });
-
-        fechaNacimiento.addEventListener("blur", function () {
-            if (fechaNacimiento.value.trim().length > 0) {
-                fechaNacimiento.classList.remove("is-invalid");
-                fechaNacimiento.classList.add("is-valid");
-            } else {
-                fechaNacimiento.classList.remove("is-valid");
-                fechaNacimiento.classList.add("is-invalid");
             }
         });
     });
