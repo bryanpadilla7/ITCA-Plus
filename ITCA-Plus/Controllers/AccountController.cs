@@ -19,13 +19,14 @@ namespace ITCA_Plus.Controllers
             Session["cuenta"] = null;
             return View();
         }
-
+      
         [HttpPost]
         public ActionResult Login(Usuarios user)
         {
             
             //Usuarios findUser = db.Usuarios.FirstOrDefault(u => u.correo == user.correo && u.contrasena == UtilidadServicio.Encriptar(user.contrasena));
             Usuarios findUser = db.Usuarios.FirstOrDefault(u => u.correo == user.correo && u.contrasena == user.contrasena);
+
 
             if (findUser == null)
             {
@@ -47,13 +48,15 @@ namespace ITCA_Plus.Controllers
             Session["cuenta"] = findUser;
             Session["rolUsuario"] = findUser.rol;
             ViewBag.Error = null;
-
+            Session["DocenteUser"]= db.Docente.FirstOrDefault(x => x.usuario_id == findUser.id);
+            
             if (findUser.rol == "Admin")
                 return RedirectToAction("Index", "Admin");
             else if (findUser.rol == "Director")
                 return RedirectToAction("Index", "Docente");
             else
                 return RedirectToAction("Index", "Home");
+            
         }
 
         public ActionResult Logout()

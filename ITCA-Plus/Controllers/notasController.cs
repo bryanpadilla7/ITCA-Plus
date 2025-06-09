@@ -18,10 +18,12 @@ namespace ITCA_Plus.Controllers
         ITCAPlusEntities contexto = new ITCAPlusEntities();
         //int userActualID = 2;
         public Usuarios UsuarioActual => Session["cuenta"] as Usuarios;
-
-        public int UsuarioID => UsuarioActual?.id ?? 0;
+        public Docente IDDocente => Session["DocenteUser"] as Docente;
+        public int UsuarioID => IDDocente?.id ?? 0;
+        
         int anioActual = DateTime.Now.Year;
         DateTime fecha = DateTime.Now;
+        
         public void llenarCmb()
         {
             
