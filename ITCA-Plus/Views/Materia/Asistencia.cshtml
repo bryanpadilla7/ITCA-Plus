@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "Asistencia";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var cliente = Session["cuenta"] as ITCA_Plus.Models.Usuarios;
+    var cliente = Session["DocenteUser"] as ITCA_Plus.Models.Docente;
 
     var existe = (bool)ViewBag.ExisteAsistencia;
     var accion = existe ? "ActualizarAsistencia" : "GuardarAsistencia";
@@ -22,7 +22,6 @@
                     <div class="col-md-6">
                         <p class="card-text"><strong>Materia:</strong> @ViewBag.Materia</p>
                         <p class="card-text"><strong>Fecha:</strong>   @ViewBag.Fecha</p>
-                        <p class="card-text"><strong>Docente:</strong> @cliente.nombre</p>
                     </div>
                     <div class="col-md-6">
                         <p class="card-text"><strong>Grado:</strong>    @ViewBag.Grado</p>

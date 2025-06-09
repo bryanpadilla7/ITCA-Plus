@@ -64,7 +64,7 @@ namespace ITCA_Plus.Controllers
         }
         public JsonResult ObtenerNotasPorAlumno()
         {
-            var usuario = Session["cuenta"] as Usuarios;
+            var usuario = Session["DocenteUser"] as Docente;
             var datos = db.vw_NotasPorAlumno
                 .Where(x => x.docente_id == usuario.id)
                 .ToList();
@@ -73,7 +73,7 @@ namespace ITCA_Plus.Controllers
 
         public JsonResult ObtenerNotasAnuales()
         {
-            var usuario = Session["cuenta"] as Usuarios;
+            var usuario = Session["DocenteUser"] as Docente;
 
             var datos = db.vw_NotasAnualesPorAlumno
                 .Where(x => x.docente_id == usuario.id)
