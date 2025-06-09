@@ -33,11 +33,11 @@ namespace ITCA_Plus.Controllers
                 return View("Login", user);
             }
 
-            if (!(bool)findUser.confirmar)
+            /*if (!(bool)findUser.confirmar)
             {
                 ViewBag.mensaje = $"Falta comfirmar su cuenta. Se le envio un correo a {findUser.correo}";
                 return View("Login", user);
-            }
+            }*/
             else if ((bool)findUser.restablecer)
             {
                 ViewBag.mensaje = $"Se ha solicitado restablecer su cuenta, favor revise su bandeja del correo {findUser.correo}";

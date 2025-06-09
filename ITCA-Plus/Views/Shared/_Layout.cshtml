@@ -92,7 +92,7 @@
                 .dropdown-menu .dropdown-item:hover {
                     background-color: rgba(255, 255, 255, 0.1);
                 }
-
+       
         /* Estilos solo para pantallas pequeñas */
         @@media (max-width: 830px) {
             .icon-navbar {
@@ -151,7 +151,8 @@
     {
         <nav class="icon-navbar d-flex flex-column align-items-center">
             <p class="d-block fw-bold text-center mt-3 text-white">ITCAPlus</p>
-            <p class="d-block text-center">@Session["nombreUsuario"]</p>
+
+            <p class="d-block fw-bold text-center mt-1 mb-4 text-white"><strong>@cliente.usuario</strong></p>
 
             @if (Session["rolUsuario"].ToString() == "Docente")
             {
@@ -164,6 +165,8 @@
                     <i class="fas fa-table nav-icon"></i>
                     <span class="nav-label">Calificaciones</span>
                 </a>
+
+
 
                 <!-- Dropdown Materias -->
                 <div class="nav-link dropdown">
@@ -192,6 +195,12 @@
                     <i class="fas fa-home nav-icon"></i>
                     <span class="nav-label">Inicio</span>
                 </a>
+
+                <a class="nav-link" href="@Url.Action("CambiosEdicion", "Edition")">
+                    <i class="fas fa-table nav-icon"></i>
+                    <span class="nav-label">Permiso edición</span>
+                </a>
+
                 <!-- Dropdown Gestión Alumnos -->
                 <div class="nav-link dropdown">
                     <i class="fas fa-user-graduate nav-icon dropdown-toggle" data-bs-toggle="dropdown"></i>
